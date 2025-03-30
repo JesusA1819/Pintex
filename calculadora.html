@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora - Pintex</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        header {
+            background: linear-gradient(135deg, #0d6efd, #198754);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        .logo {
+            width: 100px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 700;
+        }
+        .nav-link {
+            color: white !important;
+            font-size: 1.1rem;
+            padding: 10px 15px;
+            transition: all 0.3s;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        .calculator-section {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        .calculator-section h2 {
+            color: #198754;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 2px solid #198754;
+            padding-bottom: 10px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            transition: all 0.3s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+        }
+        .btn-custom {
+            background-color: #198754;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 12px 24px;
+            transition: all 0.3s;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #157347;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn-danger {
+            border-radius: 8px;
+        }
+        .result-box {
+            background-color: #e8f5e9;
+            border-left: 5px solid #198754;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .result-title {
+            font-weight: 600;
+            color: #198754;
+            margin-bottom: 10px;
+        }
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+        .table-custom {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table-custom th {
+            background-color: #198754;
+            color: white;
+        }
+        #wall-container tr:last-child {
+            border-bottom: 2px solid #198754;
+        }
+        .btn-add {
+            margin-right: 10px;
+        }
+        #total-area {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #198754;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="d-flex flex-column align-items-center">
+                <img src="imagen/logo.jpg" alt="Logo" class="logo">
+                <h1>Pintex</h1>
+            </div>
+            <p class="text-center mt-2">Calcula la cantidad exacta de pintura que necesitas para tu proyecto</p>
+        </div>
+    </header>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Pintex</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#calculator">Calculadora</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#catalog">Catálogo</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <section id="calculator" class="calculator-section">
+            <h2>Calculadora de Superficie</h2>
+            <form id="wall-form">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Ancho (m)</th>
+                                <th>Alto (m)</th>
+                                <th>Área (m²)</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wall-container">
+                            <!-- Las paredes se agregarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex flex-wrap mt-3">
+                    <button type="button" class="btn btn-custom btn-add" id="add-wall">
+                        <i class="fas fa-plus"></i> Agregar Pared
+                    </button>
+                    <button type="button" class="btn btn-custom" id="calculate-area">
+                        <i class="fas fa-calculator"></i> Calcular Área Total
+                    </button>
+                </div>
+                <div id="total-area" class="mt-3"></div>
+            </form>
+        </section>
+
+        <section id="paint-calculator" class="calculator-section">
+            <h2>Calculadora de Pintura</h2>
+            <form id="calculadoraPintura">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="area" class="form-label">Área a pintar (m²)</label>
+                        <input type="number" class="form-control" id="area" name="area" min="0.1" step="0.1" required>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="capas" class="form-label">Número de capas</label>
+                        <input type="number" class="form-control" id="capas" name="capas" min="1" max="5" value="2" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="tipoPintura" class="form-label">Tipo de pintura</label>
+                        <select class="form-select" id="tipoPintura" name="tipoPintura" required onchange="actualizarRendimiento()">
+                            <option value="interior">Interior</option>
+                            <option value="exterior">Exterior</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="tipoProducto" class="form-label">Tipo de producto</label>
+                        <select class="form-select" id="tipoProducto" name="tipoProducto" required onchange="actualizarRendimiento()">
+                            <option value="vinilica">Vinílica</option>
+                            <option value="agua">Al agua</option>
+                            <option value="esmalte">Esmalte</option>
+                            <option value="latex">Látex</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="rendimiento" class="form-label">Rendimiento (m²/litro)</label>
+                        <input type="number" class="form-control" id="rendimiento" name="rendimiento" readonly>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="tipoSuperficie" class="form-label">Tipo de superficie</label>
+                        <select class="form-select" id="tipoSuperficie" name="tipoSuperficie" required>
+                            <option value="lisa">Lisa (yeso, madera lisa)</option>
+                            <option value="nueva">Nueva (primera mano)</option>
+                            <option value="porosa">Porosa (ladrillo, hormigón)</option>
+                            <option value="metal">Metal</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <button type="button" class="btn btn-custom me-md-2" onclick="calcularPintura()">
+                        <i class="fas fa-paint-roller"></i> Calcular Pintura
+                    </button>
+                    <button type="button" class="btn btn-custom" id="go-to-quote" onclick="irACotizacion()">
+                        <i class="fas fa-file-invoice-dollar"></i> Generar Cotización
+                    </button>
+                </div>
+                
+                <div id="resultado" class="result-box mt-4" style="display: none;">
+                    <div class="result-title">RESULTADO:</div>
+                    <div class="result-value" id="result-value"></div>
+                    <div class="mt-2" id="result-details"></div>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        // Valores de rendimiento mejorados (m²/litro)
+        const rendimientos = {
+            interior: {
+                vinilica: 12,
+                agua: 10,
+                esmalte: 8,
+                latex: 11
+            },
+            exterior: {
+                vinilica: 10,
+                agua: 8,
+                esmalte: 6,
+                latex: 9
+            }
+        };
+
+        // Factores de superficie mejorados
+        const factoresSuperficie = {
+            lisa: 1.0,
+            nueva: 1.2,
+            porosa: 1.4,
+            metal: 1.3
+        };
+
+        function actualizarRendimiento() {
+            const tipoPintura = document.getElementById('tipoPintura').value;
+            const tipoProducto = document.getElementById('tipoProducto').value;
+            const rendimiento = rendimientos[tipoPintura][tipoProducto];
+            document.getElementById('rendimiento').value = rendimiento;
+        }
+
+        // Función mejorada para redirigir a cotizacion.php
+        function irACotizacion() {
+            const litrosPintura = localStorage.getItem('litrosPintura');
+            const area = document.getElementById('area').value;
+            const tipoPintura = document.getElementById('tipoPintura').value;
+            const tipoProducto = document.getElementById('tipoProducto').value;
+            
+            if (!litrosPintura || isNaN(litrosPintura)) {
+                alert('Por favor calcule primero la cantidad de pintura necesaria');
+                return;
+            }
+            
+            // Redirigir con todos los parámetros relevantes
+            window.location.href = `cotizacion.php?litros=${litrosPintura}&area=${area}&tipoPintura=${tipoPintura}&tipoProducto=${tipoProducto}`;
+        }
+
+        // Función mejorada para calcular pintura
+        function calcularPintura() {
+            // Obtener valores del formulario
+            const area = parseFloat(document.getElementById('area').value);
+            const capas = parseInt(document.getElementById('capas').value);
+            const tipoSuperficie = document.getElementById('tipoSuperficie').value;
+            const rendimiento = parseFloat(document.getElementById('rendimiento').value);
+            const tipoPintura = document.getElementById('tipoPintura').value;
+            const tipoProducto = document.getElementById('tipoProducto').value;
+
+            // Validaciones
+            if (isNaN(area) || area <= 0) {
+                alert('Por favor ingrese un área válida mayor a cero');
+                return;
+            }
+            if (isNaN(capas) || capas <= 0) {
+                alert('Por favor ingrese un número válido de capas');
+                return;
+            }
+
+            // Calcular la cantidad de pintura necesaria
+            const factorSuperficie = factoresSuperficie[tipoSuperficie] || 1.0;
+            const litrosNecesarios = (area * capas / rendimiento) * factorSuperficie;
+            const litrosRedondeados = Math.ceil(litrosNecesarios * 2) / 2; // Redondear al 0.5 más cercano
+
+            // Mostrar resultados
+            document.getElementById('result-value').innerHTML = `
+                <span class="badge bg-success fs-6">${litrosRedondeados.toFixed(1)} litros</span>
+            `;
+            
+            document.getElementById('result-details').innerHTML = `
+                <p><strong>Detalles:</strong></p>
+                <ul>
+                    <li>Área total: ${area.toFixed(2)} m²</li>
+                    <li>Número de capas: ${capas}</li>
+                    <li>Tipo de pintura: ${tipoPintura === 'interior' ? 'Interior' : 'Exterior'}</li>
+                    <li>Producto: ${document.getElementById('tipoProducto').options[document.getElementById('tipoProducto').selectedIndex].text}</li>
+                    <li>Superficie: ${document.getElementById('tipoSuperficie').options[document.getElementById('tipoSuperficie').selectedIndex].text}</li>
+                    <li>Rendimiento: ${rendimiento} m²/litro</li>
+                </ul>
+            `;
+            
+            document.getElementById('resultado').style.display = 'block';
+            
+            // Guardar datos para la cotización
+            localStorage.setItem('litrosPintura', litrosRedondeados);
+            localStorage.setItem('areaPintura', area);
+            localStorage.setItem('tipoPintura', tipoPintura);
+            localStorage.setItem('tipoProducto', tipoProducto);
+        }
+
+        // Inicializar el rendimiento al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarRendimiento();
+            
+            // Agregar primera pared por defecto
+            agregarPared();
+        });
+
+        // Función para agregar nueva pared
+        function agregarPared() {
+            const wallContainer = document.getElementById('wall-container');
+            const rowId = Date.now(); // ID único para cada fila
+
+            const newRow = document.createElement('tr');
+            newRow.id = `wall-${rowId}`;
+            newRow.classList.add('wall');
+
+            newRow.innerHTML = `
+                <td>
+                    <input type="number" class="form-control wall-width" placeholder="0.00" step="0.01" min="0.1" required>
+                </td>
+                <td>
+                    <input type="number" class="form-control wall-height" placeholder="0.00" step="0.01" min="0.1" required>
+                </td>
+                <td class="wall-area">0.00</td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-wall" title="Eliminar pared">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            wallContainer.appendChild(newRow);
+
+            // Agregar eventos a los inputs
+            newRow.querySelector('.wall-width').addEventListener('input', calcularAreaPared);
+            newRow.querySelector('.wall-height').addEventListener('input', calcularAreaPared);
+            
+            // Evento para eliminar pared
+            newRow.querySelector('.remove-wall').addEventListener('click', function() {
+                if (document.querySelectorAll('#wall-container tr').length > 1) {
+                    newRow.remove();
+                    calcularAreaTotal();
+                } else {
+                    alert('Debe haber al menos una pared');
+                }
+            });
+        }
+
+        // Calcular área de una pared individual
+        function calcularAreaPared() {
+            const row = this.closest('tr');
+            const width = parseFloat(row.querySelector('.wall-width').value) || 0;
+            const height = parseFloat(row.querySelector('.wall-height').value) || 0;
+            const area = width * height;
+            
+            row.querySelector('.wall-area').textContent = area.toFixed(2);
+            calcularAreaTotal();
+        }
+
+        // Calcular área total de todas las paredes
+        function calcularAreaTotal() {
+            const walls = document.querySelectorAll('#wall-container tr');
+            let totalArea = 0;
+
+            walls.forEach(function(wall) {
+                const area = parseFloat(wall.querySelector('.wall-area').textContent) || 0;
+                totalArea += area;
+            });
+
+            document.getElementById('total-area').innerHTML = `
+                <strong>Área total:</strong> <span class="badge bg-primary">${totalArea.toFixed(2)} m²</span>
+            `;
+            
+            // Actualizar el campo de área en la calculadora de pintura
+            document.getElementById('area').value = totalArea.toFixed(2);
+        }
+
+        // Evento para agregar pared
+        document.getElementById('add-wall').addEventListener('click', agregarPared);
+
+        // Evento para calcular área total
+        document.getElementById('calculate-area').addEventListener('click', calcularAreaTotal);
+    </script>
+</body>
+</html>

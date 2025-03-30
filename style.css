@@ -1,0 +1,810 @@
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Fondo claro */
+    color: #333; /* Texto oscuro */
+    line-height: 1.6;
+}
+
+/* Header */
+header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #f39c12; /* Color naranja pastel */
+}
+
+.header-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%; /* Hacer el logo circular */
+    object-fit: cover;
+    border: 5px solid #f3faf6; /* Bordes verdes */
+}
+
+h1 {
+    font-size: 3rem; /* Aumentar el tamaño del texto del título */
+    color: #ffffff; /* Color verde pastel */
+}
+
+/* Sección "Quiénes Somos" */
+#about {
+    padding: 40px 0;
+    text-align: center;
+    background-color: #ecf0f1;
+}
+
+#about h2 {
+    color: #f39c12; /* Color cálido (amarillo) */
+}
+
+/* Sección de introducción */
+#intro {
+    padding: 40px 0;
+    text-align: center;
+    background-color: #ecf0f1;
+}
+
+.intro-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.intro-image {
+    width: 50%;
+    border-radius: 8px;
+}
+
+/* Calculadora */
+#calculator {
+    background-color: #fff; /* Fondo blanco */
+    padding: 40px 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+button {
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Tabla de la calculadora */
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 1px solid #ddd; /* Borde claro */
+}
+
+table th, table td {
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+table th {
+    background-color: #1abc9c;
+    color: #fff;
+}
+
+table tbody tr {
+    background-color: #ecf0f1;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+table tbody tr:hover {
+    background-color: #16a085; /* Color al pasar el mouse */
+}
+
+.remove-wall {
+    background-color: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.remove-wall:hover {
+    background-color: #c0392b;
+}
+
+/* Catálogo de Materiales */
+#catalog {
+    background-color: #fff; /* Fondo blanco */
+    padding: 40px 0;
+}
+
+.catalog-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.catalog-item {
+    background-color: #f39c12; /* Color cálido (amarillo) */
+    border-radius: 8px;
+    padding: 15px;
+    width: 30%;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.catalog-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+.catalog-item img:hover {
+    transform: scale(1.1);
+}
+
+.catalog-item p {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* Estilos para el cuadro de resultado */
+#paint-needed {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f2f2f2; /* Fondo claro */
+    color: #333;  /* Texto oscuro */
+    font-size: 1rem;
+    font-weight: normal;
+    border-radius: 5px;
+    width: auto;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    border: 1px solid #ccc;  /* Borde delgado y sutil */
+}
+
+/* Estilos para el cuadro de área */
+#total-area {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f2f2f2; /* Fondo claro */
+    color: #333;  /* Texto oscuro */
+    font-size: 1rem;
+    font-weight: normal;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid #ccc;  /* Borde delgado y sutil */
+    width: auto;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* Estilo base común para todos los formularios */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+    color: #333;
+}
+
+header {
+    background-color: #16a085;
+    padding: 15px;
+    text-align: center;
+    color: white;
+}
+
+header .logo {
+    width: 50px;
+    border-radius: 50%;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-top: 10px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+/* Estilo de los formularios */
+.form-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 50px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.form-container .btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #16a085;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form-container .btn-submit:hover {
+    background-color: #1abc9c;
+}
+
+/* Estilos de la página de cotización */
+#quote {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#quote-details {
+    font-size: 1rem;
+}
+
+#quote-details p {
+    margin: 10px 0;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 5px 0;
+}
+
+#download-pdf {
+    width: 100%;
+    padding: 12px;
+    background-color: #16a085;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+#download-pdf:hover {
+    background-color: #1abc9c;
+}
+
+p a {
+    color: #16a085;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #f39c12;
+    color: white;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.option {
+    padding: 10px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #fff;
+    transition: 0.3s;
+}
+
+.option img {
+    width: 80px;
+    height: 80px;
+}
+
+.option.selected {
+    border-color: blue;
+    background-color: #e0f7ff;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #3498db;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:disabled {
+    background: gray;
+    cursor: not-allowed;
+}
+/* Estilos generales vista de administrador */ 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #f39c12;
+    color: white;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.form-container h3 {
+    color: #f39c12;
+    margin-bottom: 15px;
+}
+
+.form-container input,
+.form-container select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #16a085;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    background-color: #1abc9c;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+table th, table td {
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+table th {
+    background-color: #1abc9c;
+    color: #fff;
+}
+
+table tbody tr {
+    background-color: #ecf0f1;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+table tbody tr:hover {
+    background-color: #16a085;
+    color: #fff;
+}
+
+.actions button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.actions .edit-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.actions .edit-btn:hover {
+    background-color: #2980b9;
+}
+
+.actions .delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.actions .delete-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #f39c12;
+    color: white;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-submit {
+    padding: 10px 20px;
+    background-color: #16a085;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.btn-submit:hover {
+    background-color: #1abc9c;
+}
+
+.form-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.form-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.color-form {
+    margin-bottom: 15px;
+}
+
+.color-form input {
+    margin-bottom: 10px;
+}
+
+#lista-colores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.color-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background-color: #ecf0f1;
+    border-radius: 5px;
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+#proveedores-lista {
+    list-style: none;
+    padding: 0;
+}
+
+#proveedores-lista li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #ecf0f1;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+#proveedores-lista li button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#proveedores-lista li button:hover {
+    background-color: #2980b9;
+}
+/* Fuentes y animaciones para login y registro*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #f4f4f4, #e0e0e0); /* Fondo claro */
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #f4f4f4 0%, #e0e0e0 100%); /* Fondo claro */
+}
+
+/* Estilo del formulario */
+#login {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* Títulos */
+h3 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #1abc9c; /* Color verde pastel */
+}
+
+p {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.img-fluid {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #1abc9c; /* Color verde pastel */
+    background-color: #f5f5f5;
+}
+
+/* Pulsating effect for the image */
+.pulse-img {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Custom input fields */
+.input-custom {
+    font-size: 1rem;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 50px;
+    transition: all 0.3s ease-in-out;
+    background-color: #fefefe;
+}
+
+.input-custom:focus {
+    border-color: #1abc9c; /* Color verde pastel */
+    box-shadow: 0 0 5px rgba(26, 188, 156, 0.5);
+}
+
+/* Botón de acción */
+.btn-primary {
+    padding: 12px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 50px;
+    background-color: #1abc9c; /* Color verde pastel */
+    color: #fff;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #16a085; /* Color verde más oscuro */
+    box-shadow: 0 5px 15px rgba(26, 188, 156, 0.4);
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Enlaces */
+a {
+    color: #1abc9c; /* Color verde pastel */
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+a:hover {
+    color: #16a085; /* Color verde más oscuro */
+    text-decoration: underline;
+}
+
+/* Responsividad */
+@media (max-width: 576px) {
+    #login {
+        padding: 30px;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+}
+/* Estilos para los círculos de colores */
+.color-circle {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 5px;
+    cursor: pointer;
+    border: 2px solid #000;
+    transition: transform 0.2s ease;
+}
+
+.color-circle:hover {
+    transform: scale(1.1);
+}
+
+/* Estilos para el modal que muestra el código y nombre del color */
+.color-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.color-modal p {
+    margin: 0;
+    font-size: 16px;
+}

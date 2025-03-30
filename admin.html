@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista de Administrador - Pintex</title>
+    <link rel="stylesheet" href="style.css"> <!-- Enlaza tu archivo CSS -->
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <img src="imagen/logo.jpg" alt="Logo Pintex" class="logo">
+            <h1>Panel de Administrador</h1>
+        </div>
+    </header>
+
+    <!-- Botón para ir al registro de proveedores -->
+    <section class="container">
+        <button id="btn-registro-proveedores" class="btn-submit">Registro de Proveedores</button>
+    </section>
+
+    <!-- Sección de Registro de Proveedores (oculta inicialmente) -->
+    <section id="registro-proveedores" class="container" style="display: none;">
+        <h2>Registro de Proveedores</h2>
+        <div class="form-container">
+            <form id="form-proveedor" action="registro_proveedor.php" method="POST">
+                <input type="text" name="nombre" placeholder="Nombre del Proveedor" required>
+                <input type="text" name="telefono" placeholder="Teléfono" required pattern="^\+?[0-9]{10,15}$" title="El teléfono debe contener entre 10 y 15 dígitos y puede empezar con un signo '+'">
+                <input type="text" name="direccion" placeholder="Dirección" required>
+                <input type="text" name="colonia" placeholder="Colonia" required>
+                <button type="submit" class="btn-submit">Registrar Proveedor</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Sección de Lista de Proveedores -->
+    <section id="lista-proveedores" class="container">
+        <h2>Lista de Proveedores</h2>
+        <ul id="proveedores-lista">
+            <!-- Proveedores se cargarán aquí dinámicamente -->
+        </ul>
+    </section>
+
+    <!-- Sección de Agregar Productos (oculta inicialmente) -->
+    <section id="agregar-productos" class="container" style="display: none;">
+        <h2>Agregar Producto</h2>
+        <div class="form-container">
+            <form id="form-producto" action="agregar_producto.php" method="POST">
+                <input type="hidden" id="proveedor-id" name="proveedor_id">
+                <input type="text" name="nombre" placeholder="Nombre del Producto" required>
+                <input type="number" name="precio" placeholder="Precio" step="0.01" required min="0.01">
+                <input type="text" name="tamaño" placeholder="Tamaño" required>
+
+                <!-- Campo opcional para agregar colores -->
+                <div class="color-form">
+                    <label>Agregar Color (Opcional):</label>
+                    <input type="text" name="color-rgb" placeholder="Código RGB (ej. 255,0,0)" pattern="^(\d{1,3}),(\d{1,3}),(\d{1,3})$" title="El formato RGB debe ser como 255,0,0">
+                    <input type="text" name="color-titulo" placeholder="Título del Color" pattern="^[a-zA-Z\s]+$" title="El título del color solo puede contener letras y espacios">
+                    <button type="button" id="btn-agregar-color" class="btn-submit">Agregar Color</button>
+                </div>
+
+                <!-- Lista de colores agregados -->
+                <div id="lista-colores">
+                    <!-- Colores se agregarán aquí dinámicamente -->
+                </div>
+
+                <button type="submit" class="btn-submit">Agregar Producto</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Scripts para funcionalidad -->
+    <script src="admin.js"></script> <!-- Enlaza tu archivo JavaScript -->
+</body>
+</html>
