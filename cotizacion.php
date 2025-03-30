@@ -168,6 +168,7 @@ $tiposProducto = [
                                 <th>Precio</th>
                                 <th>Tipo</th>
                                 <th>Acción</th>
+                                <th>Imagen</th>
                             </tr>
                         </thead>
                         <tbody id="productos-disponibles-body"></tbody>
@@ -389,6 +390,8 @@ $tiposProducto = [
                         </td>
                         <td>$${parseFloat(producto.precio).toFixed(2)}</td>
                         <td>${producto.tipo || 'N/A'}</td>
+                        <td><img src="${producto.imagen || 'N/A'}" alt="Logo" width="40"></td>
+                          
                         <td>
                             <button class="btn btn-sm btn-primary btn-agregar"
                                     data-id="${producto.id}"
@@ -404,35 +407,33 @@ $tiposProducto = [
                         });
                     }
 
-                    // Procesar pinturas
-                    if (!Array.isArray(data.pinturas) || data.pinturas.length === 0) {
-                        pinturasBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No hay pinturas disponibles</td></tr>';
-                    } else {
-                        pinturasBody.innerHTML = '';
-                        data.pinturas.forEach(pintura => {
-                            const row = pinturasBody.insertRow();
-                            row.innerHTML = `
-                        <td>
-                            <strong>${pintura.nombre_color}</strong>
-                            ${pintura.marca ? `<br><small class="text-muted">${pintura.marca}</small>` : ''}
-                        </td>
-                        <td>${pintura.tipo || 'N/A'}</td>
-                        <td>${pintura.tamano || 'N/A'}</td>
-                        <td>${pintura.Precio || 'N/A'}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary btn-agregar"
-                                    data-id="${pintura.id}"
-                                    data-nombre="${pintura.tipo}"
-                                    data-precio="${pintura.Precio || '0'}">
-                                <i class="fas fa-plus"></i> Agregar
-                            </button>
-                        </td>
-                    `;
-                            row.querySelector('.btn-agregar').addEventListener('click', function () {
-                                prepararAgregarProducto(this.dataset.id, this.dataset.nombre, this.dataset.precio);
-                            });
-                        });
-                    }
+                   // Procesar pinturas
+if (!Array.isArray(data.pinturas) || data.pinturas.length === 0) {
+    pinturasBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No hay pinturas disponibles</td></tr>';
+} else {
+    pinturasBody.innerHTML = '';
+    data.pinturas.forEach(pintura => {
+        const row = pinturasBody.insertRow();
+        row.innerHTML = `
+            <td style="background-color: ${pintura.codigo_rgb};">
+                <strong>${pintura.nombre_color}</strong>
+                ${pintura.marca ? `<br><small class="text-muted">${pintura.marca}</small>` : ''}
+            </td>
+            <td>${pintura.tipo || 'N/A'}</td>
+            <td>${pintura.tamano || 'N/A'}</td>
+            <td>$${pintura.Precio ? parseFloat(pintura.Precio).toFixed(2) : 'N/A'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary btn-agregar"
+                        data-id="${pintura.id}"
+                        data-nombre="${pintura.tipo}"
+                        data-precio="${pintura.Precio || '0'}">
+                    <i class="fas fa-plus"></i> Agregar
+                </button>
+            </td>
+        `;
+    });
+}
+
                 })
                 .catch(error => {
                     loading.style.display = 'none';
