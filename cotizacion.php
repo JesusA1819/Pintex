@@ -159,33 +159,35 @@ $tiposProducto = [
                     </div>
                     <p class="mt-3">Cargando productos...</p>
                 </div>
+                <div style='display: flex !important;align-items: flex-start;'>
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Precio</th>
-                            <th>Tipo</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productos-disponibles-body"></tbody>
-                </table>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Tipo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productos-disponibles-body"></tbody>
+                    </table>
 
-                <h3>Pinturas Disponibles</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Color</th>
-                            <th>Tipo</th>
-                            <th>Tamaño</th>                            
-                            <th>Precio</th>
-                            <th>Acción</th>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Color</th>
+                                <th>Tipo</th>
+                                <th>Tamaño</th>
+                                <th>Precio</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pinturas-disponibles-body"></tbody>
+                    </table>
 
-                        </tr>
-                    </thead>
-                    <tbody id="pinturas-disponibles-body"></tbody>
-                </table>
+                </div>
 
 
                 <div class="table-responsive mt-5">
