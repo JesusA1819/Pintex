@@ -437,6 +437,7 @@ $tiposProducto = [
                 });
         }
 
+        
 
         function prepararAgregarProducto(id, nombre, precio) {
             document.getElementById('producto-id').value = id;
