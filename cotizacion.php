@@ -20,7 +20,7 @@ $tiposProducto = [
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
+Litros necesarios
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -147,7 +147,7 @@ $tiposProducto = [
                             </p>
                             <p class="mb-0"><strong><i class="fas fa-tint"></i> Litros necesarios:</strong>
                                 <span id="litros-necesarios"
-                                    class="badge badge-litros"><?php echo number_format($litrosPintura, 1); ?></span>
+                                    class="badge badge-litros" style="color: white;"><?php echo number_format($litrosPintura, 1); ?></span>
                             </p>
                         </div>
                     </div>
@@ -182,6 +182,7 @@ $tiposProducto = [
                                 <th>Tipo</th>
                                 <th>Tamaño</th>
                                 <th>Precio</th>
+                                <th></th>
                                 <th>Acción</th>
                             </tr>
                         </thead>
@@ -407,33 +408,38 @@ $tiposProducto = [
                         });
                     }
 
-                   // Procesar pinturas
-if (!Array.isArray(data.pinturas) || data.pinturas.length === 0) {
-    pinturasBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No hay pinturas disponibles</td></tr>';
-} else {
-    pinturasBody.innerHTML = '';
-    data.pinturas.forEach(pintura => {
-        const row = pinturasBody.insertRow();
-        row.innerHTML = `
-            <td style="background-color: ${pintura.codigo_rgb};">
-                <strong>${pintura.nombre_color}</strong>
-                ${pintura.marca ? `<br><small class="text-muted">${pintura.marca}</small>` : ''}
-            </td>
-            <td>${pintura.tipo || 'N/A'}</td>
-            <td>${pintura.tamano || 'N/A'}</td>
-            <td>$${pintura.Precio ? parseFloat(pintura.Precio).toFixed(2) : 'N/A'}</td>
-            <td>
-                <button class="btn btn-sm btn-primary btn-agregar"
-                        data-id="${pintura.id}"
-                        data-nombre="${pintura.tipo}"
-                        data-precio="${pintura.Precio || '0'}">
-                    <i class="fas fa-plus"></i> Agregar
-                </button>
-            </td>
-        `;
-    });
-}
-
+                    // Procesar pinturas
+                    if (!Array.isArray(data.pinturas) || data.pinturas.length === 0) {
+                        pinturasBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No hay pinturas disponibles</td></tr>';
+                    } else {
+                        pinturasBody.innerHTML = '';
+                        data.pinturas.forEach(pintura => {
+                            const row = pinturasBody.insertRow();
+                            row.innerHTML = `
+                        <td>                        
+                            <strong>${pintura.nombre_color}</strong>
+                            ${pintura.marca ? `<br><small class="text-muted">${pintura.marca}</small>` : ''}
+                        </td>
+                        <td>${pintura.tipo || 'N/A'}</td>
+                        <td>${pintura.tamano || 'N/A'}</td>
+                        <td>${pintura.Precio || 'N/A'}</td>
+                        <td class="text-center">
+                            <div style="width: 30px; height: 30px; background-color: ${pintura.codigo_rgb}; border: 1px solid #000; display: inline-block;"></div>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary btn-agregar"
+                                    data-id="${pintura.id}"
+                                    data-nombre="${pintura.tipo}"
+                                    data-precio="${pintura.Precio || '0'}">
+                                <i class="fas fa-plus"></i> Agregar
+                            </button>
+                        </td>
+                    `;
+                            row.querySelector('.btn-agregar').addEventListener('click', function () {
+                                prepararAgregarProducto(this.dataset.id, this.dataset.nombre, this.dataset.precio);
+                            });
+                        });
+                    }
                 })
                 .catch(error => {
                     loading.style.display = 'none';
