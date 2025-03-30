@@ -176,10 +176,12 @@ $tiposProducto = [
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Producto</th>
+                            <th>Color</th>
                             <th>Tipo</th>
-                            <th>Tamaño</th>
+                            <th>Tamaño</th>                            
+                            <th>Precio</th>
                             <th>Acción</th>
+
                         </tr>
                     </thead>
                     <tbody id="pinturas-disponibles-body"></tbody>
@@ -409,16 +411,17 @@ $tiposProducto = [
                             const row = pinturasBody.insertRow();
                             row.innerHTML = `
                         <td>
-                            <strong>${pintura.producto_nombre}</strong>
+                            <strong>${pintura.nombre_color}</strong>
                             ${pintura.marca ? `<br><small class="text-muted">${pintura.marca}</small>` : ''}
                         </td>
                         <td>${pintura.tipo || 'N/A'}</td>
                         <td>${pintura.tamano || 'N/A'}</td>
+                        <td>${pintura.Precio || 'N/A'}</td>
                         <td>
                             <button class="btn btn-sm btn-primary btn-agregar"
                                     data-id="${pintura.id}"
-                                    data-nombre="${pintura.producto_nombre}"
-                                    data-precio="${pintura.precio || '0'}">
+                                    data-nombre="${pintura.tipo}"
+                                    data-precio="${pintura.Precio || '0'}">
                                 <i class="fas fa-plus"></i> Agregar
                             </button>
                         </td>
@@ -437,7 +440,7 @@ $tiposProducto = [
                 });
         }
 
-        
+
 
         function prepararAgregarProducto(id, nombre, precio) {
             document.getElementById('producto-id').value = id;

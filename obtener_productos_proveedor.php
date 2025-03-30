@@ -14,7 +14,7 @@ try {
     if (!$conexion) {
         throw new Exception('Error en la conexión a la base de datos.');
     }
-    
+
 
     // Consulta para obtener productos generales del proveedor
     $sqlProductos = "SELECT id, nombre, precio, tipo FROM productos WHERE provedor_id = ?";
@@ -32,9 +32,10 @@ try {
     }
 
     // Consulta para obtener pinturas específicas del proveedor
-    $sqlPinturas = "SELECT pi.id, p.nombre AS producto_nombre, pi.tipo, pi.marca, pi.tamano
+    $sqlPinturas = "SELECT pi.id, CO.nombre_color, pi.tipo, pi.marca, pi.tamano, pi.Precio
                     FROM pinturas pi 
                     INNER JOIN productos p ON pi.producto_id = p.id 
+                    INNER JOIN colores_pintura CO ON CO.pintura_id = pi.id 
                     WHERE p.provedor_id = ?";
     $stmtPinturas = $conexion->prepare($sqlPinturas);
     if (!$stmtPinturas) {
