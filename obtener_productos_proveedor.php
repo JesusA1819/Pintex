@@ -14,6 +14,7 @@ try {
     if (!$conexion) {
         throw new Exception('Error en la conexión a la base de datos.');
     }
+    
 
     // Consulta para obtener productos generales del proveedor
     $sqlProductos = "SELECT id, nombre, precio, tipo FROM productos WHERE provedor_id = ?";

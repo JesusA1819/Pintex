@@ -20,6 +20,7 @@ $tiposProducto = [
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,18 +31,22 @@ $tiposProducto = [
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .proveedor-card {
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
+
         .proveedor-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
         .selected {
             border: 2px solid #198754;
             background-color: rgba(25, 135, 84, 0.05);
         }
+
         .info-proveedor {
             background-color: #f8f9fa;
             border-radius: 10px;
@@ -49,34 +54,41 @@ $tiposProducto = [
             margin-bottom: 20px;
             border-left: 5px solid #198754;
         }
+
         .table-cotizacion th {
             background-color: #198754;
             color: white;
         }
+
         #litros-necesarios {
             font-weight: bold;
             color: #198754;
         }
+
         .badge-litros {
             background-color: #198754;
             font-size: 1rem;
             padding: 5px 10px;
         }
+
         .btn-cotizar {
             background-color: #198754;
             color: white;
             font-weight: 600;
         }
+
         .btn-cotizar:hover {
             background-color: #157347;
             color: white;
         }
+
         .loading-spinner {
             width: 3rem;
             height: 3rem;
         }
     </style>
 </head>
+
 <body>
     <header class="bg-primary text-white text-center py-4 shadow">
         <div class="container">
@@ -90,8 +102,10 @@ $tiposProducto = [
             <a class="navbar-brand fw-bold" href="index.html">Pintex</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="index.html#calculator"><i class="fas fa-calculator"></i> Calculadora</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#calculator"><i
+                                class="fas fa-calculator"></i> Calculadora</a></li>
                 </ul>
             </div>
         </div>
@@ -99,11 +113,11 @@ $tiposProducto = [
 
     <main class="container py-4">
         <!-- Mostrar alerta si no hay datos de cálculo -->
-        <?php if($litrosPintura <= 0): ?>
-        <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle"></i> No se han recibido datos de cálculo válidos. 
-            <a href="index.html#calculator" class="alert-link">Volver a la calculadora</a>
-        </div>
+        <?php if ($litrosPintura <= 0): ?>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> No se han recibido datos de cálculo válidos.
+                <a href="index.html#calculator" class="alert-link">Volver a la calculadora</a>
+            </div>
         <?php endif; ?>
 
         <div class="cotizacion-container">
@@ -112,50 +126,66 @@ $tiposProducto = [
                 <h3 class="mb-4"><i class="fas fa-truck"></i> Seleccione un proveedor</h3>
                 <div id="proveedores-container" class="row mt-3 g-3"></div>
             </div>
-            
+
             <!-- Sección de productos -->
             <div id="seccion-productos" style="display: none;">
                 <div id="info-proveedor" class="info-proveedor">
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                            <h3><i class="fas fa-building"></i> Proveedor: <span id="proveedor-nombre" class="text-primary"></span></h3>
-                            <p class="mb-1"><strong><i class="fas fa-phone"></i> Teléfono:</strong> <span id="proveedor-telefono"></span></p>
+                            <h3><i class="fas fa-building"></i> Proveedor: <span id="proveedor-nombre"
+                                    class="text-primary"></span></h3>
+                            <p class="mb-1"><strong><i class="fas fa-phone"></i> Teléfono:</strong> <span
+                                    id="proveedor-telefono"></span></p>
                         </div>
                         <div class="mt-2 mt-md-0">
-                            <p class="mb-1"><strong><i class="fas fa-ruler-combined"></i> Área a pintar:</strong> <?php echo number_format($areaPintura, 2); ?> m²</p>
-                            <p class="mb-1"><strong><i class="fas fa-paint-roller"></i> Tipo:</strong> 
-                                <?php echo isset($tiposPintura[$tipoPintura]) ? $tiposPintura[$tipoPintura] : 'N/A'; ?> - 
+                            <p class="mb-1"><strong><i class="fas fa-ruler-combined"></i> Área a pintar:</strong>
+                                <?php echo number_format($areaPintura, 2); ?> m²</p>
+                            <p class="mb-1"><strong><i class="fas fa-paint-roller"></i> Tipo:</strong>
+                                <?php echo isset($tiposPintura[$tipoPintura]) ? $tiposPintura[$tipoPintura] : 'N/A'; ?>
+                                -
                                 <?php echo isset($tiposProducto[$tipoProducto]) ? $tiposProducto[$tipoProducto] : 'N/A'; ?>
                             </p>
-                            <p class="mb-0"><strong><i class="fas fa-tint"></i> Litros necesarios:</strong> 
-                                <span id="litros-necesarios" class="badge badge-litros"><?php echo number_format($litrosPintura, 1); ?></span>
+                            <p class="mb-0"><strong><i class="fas fa-tint"></i> Litros necesarios:</strong>
+                                <span id="litros-necesarios"
+                                    class="badge badge-litros"><?php echo number_format($litrosPintura, 1); ?></span>
                             </p>
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="loading" class="text-center py-5">
                     <div class="spinner-border text-primary loading-spinner" role="status">
                         <span class="visually-hidden">Cargando...</span>
                     </div>
                     <p class="mt-3">Cargando productos...</p>
                 </div>
-                
-                <div class="table-responsive">
-                    <h4 class="mb-3"><i class="fas fa-box-open"></i> Productos disponibles</h4>
-                    <table class="table table-bordered table-hover" id="tabla-productos-disponibles">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Producto</th>
-                                <th>Precio</th>
-                                <th>Tipo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productos-disponibles-body"></tbody>
-                    </table>
-                </div>
-                
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Tipo</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productos-disponibles-body"></tbody>
+                </table>
+
+                <h3>Pinturas Disponibles</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Tipo</th>
+                            <th>Tamaño</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pinturas-disponibles-body"></tbody>
+                </table>
+
+
                 <div class="table-responsive mt-5">
                     <h4 class="mb-3"><i class="fas fa-file-invoice-dollar"></i> Productos en la cotización</h4>
                     <table class="table table-bordered table-cotizacion" id="tabla-cotizacion">
@@ -180,7 +210,7 @@ $tiposProducto = [
                         </tfoot>
                     </table>
                 </div>
-                
+
                 <div class="d-flex justify-content-between mt-4">
                     <button id="cambiar-proveedor" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Cambiar Proveedor
@@ -198,8 +228,10 @@ $tiposProducto = [
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="modalCantidadLabel"><i class="fas fa-cart-plus"></i> Agregar Producto</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <h5 class="modal-title" id="modalCantidadLabel"><i class="fas fa-cart-plus"></i> Agregar Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
                     <form id="form-cantidad">
@@ -213,8 +245,10 @@ $tiposProducto = [
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="agregar-producto"><i class="fas fa-check"></i> Agregar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>
+                        Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="agregar-producto"><i class="fas fa-check"></i>
+                        Agregar</button>
                 </div>
             </div>
         </div>
@@ -226,29 +260,29 @@ $tiposProducto = [
         const urlParams = new URLSearchParams(window.location.search);
         const litrosPintura = urlParams.get('litros') || <?php echo $litrosPintura; ?>;
         const areaPintura = urlParams.get('area') || <?php echo $areaPintura; ?>;
-        
+
         let proveedorSeleccionado = null;
         const cantidadModal = new bootstrap.Modal(document.getElementById('modal-cantidad'));
-        
-        document.addEventListener('DOMContentLoaded', function() {
+
+        document.addEventListener('DOMContentLoaded', function () {
             // Mostrar litros de pintura si existen
             if (litrosPintura && litrosPintura > 0) {
                 document.getElementById('litros-necesarios').textContent = parseFloat(litrosPintura).toFixed(1);
             }
-            
+
             cargarProveedores();
-            
+
             // Evento para agregar producto desde el modal
             document.getElementById('agregar-producto').addEventListener('click', agregarProductoCotizacion);
-            
+
             // Evento para cambiar de proveedor
-            document.getElementById('cambiar-proveedor').addEventListener('click', function() {
+            document.getElementById('cambiar-proveedor').addEventListener('click', function () {
                 document.getElementById('seccion-productos').style.display = 'none';
                 document.getElementById('seleccion-proveedor').style.display = 'block';
             });
-            
+
             // Evento para guardar cotización
-            document.getElementById('guardar-cotizacion').addEventListener('click', function() {
+            document.getElementById('guardar-cotizacion').addEventListener('click', function () {
                 guardarCotizacion();
             });
         });
@@ -261,15 +295,15 @@ $tiposProducto = [
                 })
                 .then(data => {
                     if (!data.success) throw new Error(data.error || 'Error en los datos');
-                    
+
                     const container = document.getElementById('proveedores-container');
                     container.innerHTML = '';
-                    
+
                     if (data.data.length === 0) {
                         container.innerHTML = '<div class="col-12 text-center py-4"><p>No hay proveedores disponibles</p></div>';
                         return;
                     }
-                    
+
                     data.data.forEach(proveedor => {
                         const card = document.createElement('div');
                         card.className = 'col-md-4';
@@ -282,11 +316,11 @@ $tiposProducto = [
                                 </div>
                             </div>
                         `;
-                        
-                        card.querySelector('.card').addEventListener('click', function() {
+
+                        card.querySelector('.card').addEventListener('click', function () {
                             seleccionarProveedor(proveedor);
                         });
-                        
+
                         container.appendChild(card);
                     });
                 })
@@ -298,7 +332,7 @@ $tiposProducto = [
 
         function seleccionarProveedor(proveedor) {
             proveedorSeleccionado = proveedor;
-            
+
             // Actualizar UI
             document.querySelectorAll('.proveedor-card').forEach(card => {
                 card.classList.remove('selected');
@@ -306,82 +340,102 @@ $tiposProducto = [
                     card.classList.add('selected');
                 }
             });
-            
+
             document.getElementById('proveedor-nombre').textContent = proveedor.nombre;
             document.getElementById('proveedor-telefono').textContent = proveedor.telefono;
-            
+
             // Mostrar sección de productos
             document.getElementById('seleccion-proveedor').style.display = 'none';
             document.getElementById('seccion-productos').style.display = 'block';
-            
+
             // Cargar productos del proveedor
             cargarProductosProveedor(proveedor.id);
         }
 
         function cargarProductosProveedor(proveedorId) {
-    const loading = document.getElementById('loading');
-    const productosBody = document.getElementById('productos-disponibles-body');
-    
-    loading.style.display = 'block';
-    productosBody.innerHTML = '';
-    
-    fetch(`obtener_productos_proveedor.php?proveedor_id=${proveedorId}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Error en la respuesta del servidor');
-            return response.json();
-        })
-        .then(data => {
-            loading.style.display = 'none';
-            
-            if (!data.success) throw new Error(data.error || 'Error en los datos');
+            const loading = document.getElementById('loading');
+            const productosBody = document.getElementById('productos-disponibles-body');
+            const pinturasBody = document.getElementById('pinturas-disponibles-body');
 
-            if (!Array.isArray(data.productos) || data.productos.length === 0) {
-                productosBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No hay productos disponibles para este proveedor</td></tr>';
-                return;
-            }
-            
+            loading.style.display = 'block';
             productosBody.innerHTML = '';
-            
-            data.productos.forEach(producto => {
-                const row = productosBody.insertRow();
-                row.innerHTML = `
-                    <td>
-                        <strong>${producto.nombre}</strong>
-                        ${producto.marca ? `<br><small class="text-muted">${producto.marca}</small>` : ''}
-                    </td>
-                    <td>$${parseFloat(producto.precio).toFixed(2)}</td>
-                    <td>${producto.tipo_pintura || producto.tipo || 'N/A'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary btn-agregar"
-                                data-id="${producto.id}"
-                                data-nombre="${producto.nombre}"
-                                data-precio="${producto.precio}">
-                            <i class="fas fa-plus"></i> Agregar
-                        </button>
-                    </td>
-                `;
-                
-                row.querySelector('.btn-agregar').addEventListener('click', function() {
-                    prepararAgregarProducto(
-                        this.dataset.id,
-                        this.dataset.nombre,
-                        this.dataset.precio
-                    );
+            pinturasBody.innerHTML = '';
+
+            fetch(`obtener_productos_proveedor.php?proveedor_id=${proveedorId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Error en la respuesta del servidor');
+                    return response.json();
+                })
+                .then(data => {
+                    loading.style.display = 'none';
+
+                    if (!data.success) throw new Error(data.error || 'Error en los datos');
+
+                    // Procesar productos generales
+                    if (!Array.isArray(data.productos) || data.productos.length === 0) {
+                        productosBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No hay productos disponibles</td></tr>';
+                    } else {
+                        productosBody.innerHTML = '';
+                        data.productos.forEach(producto => {
+                            const row = productosBody.insertRow();
+                            row.innerHTML = `
+                        <td>
+                            <strong>${producto.nombre}</strong>
+                            ${producto.marca ? `<br><small class="text-muted">${producto.marca}</small>` : ''}
+                        </td>
+                        <td>$${parseFloat(producto.precio).toFixed(2)}</td>
+                        <td>${producto.tipo || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary btn-agregar"
+                                    data-id="${producto.id}"
+                                    data-nombre="${producto.nombre}"
+                                    data-precio="${producto.precio}">
+                                <i class="fas fa-plus"></i> Agregar
+                            </button>
+                        </td>
+                    `;
+                            row.querySelector('.btn-agregar').addEventListener('click', function () {
+                                prepararAgregarProducto(this.dataset.id, this.dataset.nombre, this.dataset.precio);
+                            });
+                        });
+                    }
+
+                    // Procesar pinturas
+                    if (!Array.isArray(data.pinturas) || data.pinturas.length === 0) {
+                        pinturasBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No hay pinturas disponibles</td></tr>';
+                    } else {
+                        pinturasBody.innerHTML = '';
+                        data.pinturas.forEach(pintura => {
+                            const row = pinturasBody.insertRow();
+                            row.innerHTML = `
+                        <td>
+                            <strong>${pintura.producto_nombre}</strong>
+                            ${pintura.marca ? `<br><small class="text-muted">${pintura.marca}</small>` : ''}
+                        </td>
+                        <td>${pintura.tipo || 'N/A'}</td>
+                        <td>${pintura.tamano || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary btn-agregar"
+                                    data-id="${pintura.id}"
+                                    data-nombre="${pintura.producto_nombre}"
+                                    data-precio="${pintura.precio || '0'}">
+                                <i class="fas fa-plus"></i> Agregar
+                            </button>
+                        </td>
+                    `;
+                            row.querySelector('.btn-agregar').addEventListener('click', function () {
+                                prepararAgregarProducto(this.dataset.id, this.dataset.nombre, this.dataset.precio);
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    console.error('Error:', error);
+                    productosBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle"></i> ${error.message}</td></tr>`;
+                    pinturasBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle"></i> ${error.message}</td></tr>`;
                 });
-            });
-        })
-        .catch(error => {
-            loading.style.display = 'none';
-            console.error('Error:', error);
-            productosBody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-center text-danger py-4">
-                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
-                    </td>
-                </tr>
-            `;
-        });
-}
+        }
 
 
         function prepararAgregarProducto(id, nombre, precio) {
@@ -389,7 +443,7 @@ $tiposProducto = [
             document.getElementById('producto-nombre').value = nombre;
             document.getElementById('producto-precio').value = precio;
             document.getElementById('cantidad').value = 1;
-            
+
             cantidadModal.show();
         }
 
@@ -398,21 +452,21 @@ $tiposProducto = [
             const nombre = document.getElementById('producto-nombre').value;
             const precio = parseFloat(document.getElementById('producto-precio').value);
             const cantidad = parseInt(document.getElementById('cantidad').value);
-        
+
             if (!proveedorSeleccionado) {
                 alert('No se ha seleccionado un proveedor');
                 return;
             }
-            
+
             if (isNaN(cantidad)) {
                 alert('Por favor ingrese una cantidad válida');
                 return;
             }
-            
+
             const subtotal = (precio * cantidad).toFixed(2);
             const productosBody = document.getElementById('productos-cotizacion-body');
             const row = productosBody.insertRow();
-            
+
             row.innerHTML = `
                 <td>${productosBody.rows.length + 1}</td>
                 <td>${nombre}</td>
@@ -429,9 +483,9 @@ $tiposProducto = [
                     </button>
                 </td>
             `;
-            
+
             // Configurar eventos para los botones
-            row.querySelector('.btn-editar').addEventListener('click', function() {
+            row.querySelector('.btn-editar').addEventListener('click', function () {
                 const currentRow = this.closest('tr');
                 prepararAgregarProducto(
                     id,
@@ -442,15 +496,15 @@ $tiposProducto = [
                 currentRow.remove();
                 calcularTotal();
             });
-            
-            row.querySelector('.btn-eliminar').addEventListener('click', function() {
+
+            row.querySelector('.btn-eliminar').addEventListener('click', function () {
                 if (confirm('¿Eliminar este producto de la cotización?')) {
                     this.closest('tr').remove();
                     actualizarNumeracion();
                     calcularTotal();
                 }
             });
-            
+
             cantidadModal.hide();
             calcularTotal();
         }
@@ -465,24 +519,24 @@ $tiposProducto = [
         function calcularTotal() {
             const rows = document.getElementById('productos-cotizacion-body').rows;
             let total = 0;
-            
+
             for (let i = 0; i < rows.length; i++) {
                 const subtotal = parseFloat(rows[i].cells[5].textContent.replace('$', ''));
                 total += subtotal;
             }
-            
+
             document.getElementById('total-cotizacion').textContent = `$${total.toFixed(2)}`;
         }
 
         function guardarCotizacion() {
             const productos = [];
             const rows = document.getElementById('productos-cotizacion-body').rows;
-            
+
             if (rows.length === 0) {
                 alert('No hay productos en la cotización');
                 return;
             }
-            
+
             for (let i = 0; i < rows.length; i++) {
                 productos.push({
                     nombre: rows[i].cells[1].textContent,
@@ -492,7 +546,7 @@ $tiposProducto = [
                     subtotal: rows[i].cells[5].textContent.replace('$', '')
                 });
             }
-            
+
             const total = document.getElementById('total-cotizacion').textContent.replace('$', '');
             const cotizacion = {
                 proveedor: proveedorSeleccionado,
@@ -502,14 +556,15 @@ $tiposProducto = [
                 total: total,
                 fecha: new Date().toLocaleDateString()
             };
-            
+
             // Aquí puedes enviar la cotización al servidor o guardarla localmente
             console.log('Cotización a guardar:', cotizacion);
             alert('Cotización generada correctamente');
-            
+
             // Opcional: Redirigir a una página de resumen
             // window.location.href = `resumen_cotizacion.php?data=${encodeURIComponent(JSON.stringify(cotizacion))}`;
         }
     </script>
 </body>
+
 </html>
