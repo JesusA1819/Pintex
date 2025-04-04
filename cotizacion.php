@@ -19,14 +19,13 @@ $params = [];
 $types = '';
 
 if (!empty($busqueda_proveedor)) {
-    $query_proveedores .= " AND (nombre LIKE ? OR descripcion LIKE ?)";
-    $params[] = "%$busqueda_proveedor%";
+    $query_proveedores .= " AND (nombre LIKE ?)";
     $params[] = "%$busqueda_proveedor%";
     $types .= 'ss';
 }
 
 if (!empty($colonia)) {
-    $query_proveedores .= " AND direccion LIKE ?";
+    $query_proveedores .= " AND colonia LIKE ?";
     $params[] = "%$colonia%";
     $types .= 's';
 }
