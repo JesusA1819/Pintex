@@ -130,6 +130,7 @@ $conexion->close();
             <img class="img-fluid d-block mx-auto mb-3" src="imagen/logo.jpg" alt="Logo Pintex" style="width: 100px;">
             <h3>¡Regístrate!</h3>
             <p class="text-muted">Crea una cuenta para continuar</p>
+        
         </div>
         <?php if (isset($error_registro)): ?>
             <p class="text-danger text-center"><?php echo $error_registro; ?></p>
@@ -147,7 +148,7 @@ $conexion->close();
             <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
             <div class="text-center mt-3">
                 <a href="index.php" class="text-muted">¿Ya tienes una cuenta? Inicia sesión</a>
-            </div>
+    
         </form>
     </div>
 </body>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Completo de Colores</title>
+    <style>
+        :root {
+            --color-primario: #0d6efd;
+            --color-secundario: #198754;
+            --color-fondo: #f8f9fa;
+            --color-texto: #333;
+            --texto-oscuro: #222;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* BUSCADOR COMPACTO Y CENTRADO */
+        .search-container {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 0 auto 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .search-title {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: var(--color-primario);
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .search-input {
+            width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .search-button {
+            background: var(--color-primario);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .search-button:hover {
+            background: #0b5ed7;
+        }
+        
+        /* RESULTADO DE BÚSQUEDA COMPACTO */
+        .search-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: white;
+            display: none;
+            text-align: center;
+        }
+        
+        .searched-color-container {
+            display: inline-block;
+            width: 150px;
+            margin: 0 auto;
+        }
+        
+        .searched-color-card {
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+        }
+        
+        .searched-color-display {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--texto-oscuro);
+            font-size: 13px;
+            text-shadow: 0 0 4px rgba(255,255,255,0.7);
+        }
+        
+        .searched-color-info {
+            padding: 8px;
+            background: white;
+        }
+        
+        .searched-color-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 12px;
+            color: var(--texto-oscuro);
+        }
+        
+        .searched-color-code {
+            font-size: 11px;
+            color: #555;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .color-families {
+            margin-top: 20px;
+        }
+        
+        .family-title {
+            font-size: 24px;
+            margin: 40px 0 20px;
+            color: var(--color-primario);
+            border-bottom: 2px solid var(--color-primario);
+            padding-bottom: 8px;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .color-card {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+        
+        .color-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .color-display {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--texto-oscuro);
+            font-size: 15px;
+            text-shadow: 0 0 5px rgba(255,255,255,0.7);
+        }
+        
+        .color-info {
+            padding: 12px;
+            background: white;
+        }
+        
+        .color-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--texto-oscuro);
+        }
+        
+        .color-code {
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        }
+        
+        .modal-color {
+            width: 100%;
+            height: 180px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--texto-oscuro);
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 0 8px rgba(255,255,255,0.8);
+        }
+        
+        .modal h2, .modal p {
+            color: var(--texto-oscuro);
+        }
+        
+        .close-modal {
+            background: var(--color-primario);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .close-modal:hover {
+            background: #0b5ed7;
+        }
+        
+        @media (max-width: 768px) {
+            .color-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            
+            .color-display {
+                height: 100px;
+                font-size: 14px;
+            }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> Catálogo Completo de Colores</h1>
+            <p>El color que desees ¡Aqui lo encuentras!</p>
+        </div>
+        
+        <!-- BUSCADOR COMPACTO -->
+        <div class="search-container">
+            <h3 class="search-title">Buscar color por RGB</h3>
+            <form class="search-form" id="rgbSearchForm">
+                <input type="text" class="search-input" id="rgbInput" 
+                       placeholder="Ej: rgb(255,0,0) o 255,0,0" required>
+                <button type="submit" class="search-button">Buscar</button>
+            </form>
+            <div class="search-result" id="searchResult">
+                <div class="searched-color-container">
+                    <div class="searched-color-card">
+                        <div class="searched-color-display" id="searchedColorDisplay"></div>
+                        <div class="searched-color-info" id="searchedColorInfo"></div>
+                    </div>
+                </div>
+                <div id="errorMessage" class="error-message"></div>
+            </div>
+        </div>
+        
+        <div class="color-families">
+            <h2 class="family-title">Gamas de Colores</h2>
+            
+            <h3>Blancos y Grises</h3>
+            <div class="color-grid" id="blancos-grises-colores"></div>
+            
+            <h3>Negros</h3>
+            <div class="color-grid" id="negros-colores"></div>
+            
+            <h3>Azules</h3>
+            <div class="color-grid" id="azules-colores"></div>
+            
+            <h3>Verdes</h3>
+            <div class="color-grid" id="verdes-colores"></div>
+            
+            <h3>Cafés y Beiges</h3>
+            <div class="color-grid" id="cafes-colores"></div>
+            
+            <h3>Rosas</h3>
+            <div class="color-grid" id="rosas-colores"></div>
+            
+            <h3>Morados</h3>
+            <div class="color-grid" id="morados-colores"></div>
+            
+            <h3>Rojos y Naranjas</h3>
+            <div class="color-grid" id="rojos-colores"></div>
+            
+            <h3>Amarillos y Dorados</h3>
+            <div class="color-grid" id="amarillos-colores"></div>
+        </div>
+    </div>
+    
+    <div class="modal" id="colorModal">
+        <div class="modal-content">
+            <div class="modal-color" id="modalColorDisplay"></div>
+            <h2 id="modalColorName"></h2>
+            <p id="modalColorCode"></p>
+            <p id="modalRGBValue"></p>
+            <button class="close-modal" id="closeModal">Cerrar</button>
+        </div>
+    </div>
+    
+    <script>
+        // Base de datos completa de colores
+        const colores = {
+            blancosGrises: [
+                { nombre: "Blanco Puro", codigo: "BG-001", rgb: "rgb(255, 255, 255)" },
+                { nombre: "Blanco Nieve", codigo: "BG-002", rgb: "rgb(250, 250, 250)" },
+                { nombre: "Blanco Roto", codigo: "BG-003", rgb: "rgb(245, 245, 245)" },
+                { nombre: "Gris Perla Claro", codigo: "BG-004", rgb: "rgb(243, 244, 246)" },
+                { nombre: "Gris Perla Medio", codigo: "BG-005", rgb: "rgb(209, 213, 219)" },
+                { nombre: "Gris Perla Oscuro", codigo: "BG-006", rgb: "rgb(156, 163, 175)" },
+                { nombre: "Gris Plata", codigo: "BG-007", rgb: "rgb(107, 114, 128)" },
+                { nombre: "Gris Piedra", codigo: "BG-008", rgb: "rgb(75, 85, 99)" }
+            ],
+            negros: [
+                { nombre: "Gris Carbón", codigo: "N-001", rgb: "rgb(55, 65, 81)" },
+                { nombre: "Gris Oscuro", codigo: "N-002", rgb: "rgb(31, 41, 55)" },
+                { nombre: "Negro Suave", codigo: "N-003", rgb: "rgb(17, 24, 39)" },
+                { nombre: "Negro Absoluto", codigo: "N-004", rgb: "rgb(0, 0, 0)" },
+                { nombre: "Negro Azulado", codigo: "N-005", rgb: "rgb(15, 23, 42)" },
+                { nombre: "Negro Mate", codigo: "N-006", rgb: "rgb(30, 30, 30)" }
+            ],
+            azules: [
+                { nombre: "Azul Cielo Claro", codigo: "AZ-001", rgb: "rgb(239, 246, 255)" },
+                { nombre: "Azul Cielo Medio", codigo: "AZ-002", rgb: "rgb(219, 234, 254)" },
+                { nombre: "Azul Celeste", codigo: "AZ-003", rgb: "rgb(191, 219, 254)" },
+                { nombre: "Azul Bebé", codigo: "AZ-004", rgb: "rgb(147, 197, 253)" },
+                { nombre: "Azul Rey Claro", codigo: "AZ-005", rgb: "rgb(96, 165, 250)" },
+                { nombre: "Azul Rey", codigo: "AZ-006", rgb: "rgb(59, 130, 246)" },
+                { nombre: "Azul Marino", codigo: "AZ-007", rgb: "rgb(37, 99, 235)" },
+                { nombre: "Azul Oscuro", codigo: "AZ-008", rgb: "rgb(29, 78, 216)" },
+                { nombre: "Azul Noche", codigo: "AZ-009", rgb: "rgb(30, 64, 175)" }
+            ],
+            verdes: [
+                { nombre: "Verde Menta Claro", codigo: "V-001", rgb: "rgb(240, 253, 244)" },
+                { nombre: "Verde Menta", codigo: "V-002", rgb: "rgb(220, 252, 231)" },
+                { nombre: "Verde Manzana", codigo: "V-003", rgb: "rgb(187, 247, 208)" },
+                { nombre: "Verde Limón", codigo: "V-004", rgb: "rgb(134, 239, 172)" },
+                { nombre: "Verde Esmeralda Claro", codigo: "V-005", rgb: "rgb(74, 222, 128)" },
+                { nombre: "Verde Esmeralda", codigo: "V-006", rgb: "rgb(34, 197, 94)" },
+                { nombre: "Verde Bosque", codigo: "V-007", rgb: "rgb(22, 163, 74)" },
+                { nombre: "Verde Oliva", codigo: "V-008", rgb: "rgb(21, 128, 61)" },
+                { nombre: "Verde Oscuro", codigo: "V-009", rgb: "rgb(22, 101, 52)" }
+            ],
+            cafes: [
+                { nombre: "Beige Claro", codigo: "C-001", rgb: "rgb(254, 243, 199)" },
+                { nombre: "Beige Arena", codigo: "C-002", rgb: "rgb(253, 230, 138)" },
+                { nombre: "Beige Oro", codigo: "C-003", rgb: "rgb(252, 211, 77)" },
+                { nombre: "Café Claro", codigo: "C-004", rgb: "rgb(245, 158, 11)" },
+                { nombre: "Café Miel", codigo: "C-005", rgb: "rgb(217, 119, 6)" },
+                { nombre: "Café Canela", codigo: "C-006", rgb: "rgb(180, 83, 9)" },
+                { nombre: "Café Oscuro", codigo: "C-007", rgb: "rgb(146, 64, 14)" },
+                { nombre: "Café Chocolate", codigo: "C-008", rgb: "rgb(120, 53, 15)" },
+                { nombre: "Café Ébano", codigo: "C-009", rgb: "rgb(69, 26, 3)" }
+            ],
+            rosas: [
+                { nombre: "Rosa Pálido", codigo: "R-001", rgb: "rgb(251, 207, 232)" },
+                { nombre: "Rosa Claro", codigo: "R-002", rgb: "rgb(249, 168, 212)" },
+                { nombre: "Rosa Melón", codigo: "R-003", rgb: "rgb(244, 114, 182)" },
+                { nombre: "Rosa Fucsia", codigo: "R-004", rgb: "rgb(236, 72, 153)" },
+                { nombre: "Rosa Frambuesa", codigo: "R-005", rgb: "rgb(219, 39, 119)" },
+                { nombre: "Rosa Profundo", codigo: "R-006", rgb: "rgb(190, 24, 93)" },
+                { nombre: "Rosa Vino", codigo: "R-007", rgb: "rgb(157, 23, 77)" }
+            ],
+            morados: [
+                { nombre: "Lila Pálido", codigo: "M-001", rgb: "rgb(245, 243, 255)" },
+                { nombre: "Lavanda Claro", codigo: "M-002", rgb: "rgb(237, 233, 254)" },
+                { nombre: "Lavanda", codigo: "M-003", rgb: "rgb(221, 214, 254)" },
+                { nombre: "Orquídea", codigo: "M-004", rgb: "rgb(196, 181, 253)" },
+                { nombre: "Morado Lilac", codigo: "M-005", rgb: "rgb(167, 139, 250)" },
+                { nombre: "Morado Real", codigo: "M-006", rgb: "rgb(139, 92, 246)" },
+                { nombre: "Morado Intenso", codigo: "M-007", rgb: "rgb(124, 58, 237)" },
+                { nombre: "Morado Violeta", codigo: "M-008", rgb: "rgb(109, 40, 217)" },
+                { nombre: "Morado Berenjena", codigo: "M-009", rgb: "rgb(91, 33, 182)" }
+            ],
+            rojos: [
+                { nombre: "Rojo Claro", codigo: "RJ-001", rgb: "rgb(254, 226, 226)" },
+                { nombre: "Rojo Coral", codigo: "RJ-002", rgb: "rgb(254, 202, 202)" },
+                { nombre: "Rojo Melón", codigo: "RJ-003", rgb: "rgb(252, 165, 165)" },
+                { nombre: "Rojo Tomate", codigo: "RJ-004", rgb: "rgb(248, 113, 113)" },
+                { nombre: "Rojo Fuego", codigo: "RJ-005", rgb: "rgb(239, 68, 68)" },
+                { nombre: "Rojo Sangre", codigo: "RJ-006", rgb: "rgb(220, 38, 38)" },
+                { nombre: "Rojo Vino", codigo: "RJ-007", rgb: "rgb(185, 28, 28)" },
+                { nombre: "Rojo Oscuro", codigo: "RJ-008", rgb: "rgb(153, 27, 27)" }
+            ],
+            amarillos: [
+                { nombre: "Amarillo Pálido", codigo: "AM-001", rgb: "rgb(254, 249, 195)" },
+                { nombre: "Amarillo Mantequilla", codigo: "AM-002", rgb: "rgb(254, 240, 138)" },
+                { nombre: "Amarillo Limón", codigo: "AM-003", rgb: "rgb(253, 224, 71)" },
+                { nombre: "Amarillo Oro", codigo: "AM-004", rgb: "rgb(250, 204, 21)" },
+                { nombre: "Amarillo Mostaza", codigo: "AM-005", rgb: "rgb(234, 179, 8)" },
+                { nombre: "Amarillo Ocre", codigo: "AM-006", rgb: "rgb(202, 138, 4)" },
+                { nombre: "Dorado Claro", codigo: "AM-007", rgb: "rgb(253, 230, 138)" },
+                { nombre: "Dorado Oscuro", codigo: "AM-008", rgb: "rgb(234, 179, 8)" }
+            ]
+        };
+
+        // Función mejorada para buscar color por RGB
+        function buscarColorPorRGB(rgbInput) {
+            // Limpiar mensajes de error previos
+            document.getElementById('errorMessage').textContent = '';
+            
+            let rgbValues;
+            const rgbRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i;
+            const match = rgbInput.match(rgbRegex);
+            
+            if (match) {
+                rgbValues = [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
+            } else {
+                // Probar formato sin "rgb()"
+                const numbers = rgbInput.split(/\s*,\s*/).map(num => parseInt(num));
+                if (numbers.length === 3 && numbers.every(num => !isNaN(num) && num >= 0 && num <= 255)) {
+                    rgbValues = numbers;
+                } else {
+                    // Mostrar mensaje de error específico
+                    const errorMsg = document.getElementById('errorMessage');
+                    errorMsg.textContent = 'Formato incorrecto. Use: rgb(255,255,255) o 255,255,255';
+                    return null;
+                }
+            }
+            
+            // Validar valores RGB
+            if (rgbValues.some(val => val < 0 || val > 255)) {
+                document.getElementById('errorMessage').textContent = 'Valores RGB deben estar entre 0 y 255';
+                return null;
+            }
+            
+            const rgbString = `rgb(${rgbValues[0]}, ${rgbValues[1]}, ${rgbValues[2]})`;
+            
+            // Buscar en todos los colores
+            for (const familia in colores) {
+                const colorEncontrado = colores[familia].find(color => 
+                    color.rgb.toLowerCase() === rgbString.toLowerCase());
+                if (colorEncontrado) {
+                    return colorEncontrado;
+                }
+            }
+            
+            // Si no se encuentra, devolver color personalizado
+            return {
+                nombre: "Color Personalizado",
+                codigo: "RGB",
+                rgb: rgbString
+            };
+        }
+        
+        // Función para renderizar todas las gamas de color
+        function renderizarColores() {
+            renderizarGama('blancosGrises', 'blancos-grises-colores');
+            renderizarGama('negros', 'negros-colores');
+            renderizarGama('azules', 'azules-colores');
+            renderizarGama('verdes', 'verdes-colores');
+            renderizarGama('cafes', 'cafes-colores');
+            renderizarGama('rosas', 'rosas-colores');
+            renderizarGama('morados', 'morados-colores');
+            renderizarGama('rojos', 'rojos-colores');
+            renderizarGama('amarillos', 'amarillos-colores');
+        }
+        
+        // Función para renderizar una gama específica
+        function renderizarGama(gama, elementoId) {
+            const grid = document.getElementById(elementoId);
+            colores[gama].forEach(color => {
+                grid.appendChild(crearTarjetaColor(color));
+            });
+        }
+        
+        // Función para crear tarjeta de color
+        function crearTarjetaColor(color) {
+            const card = document.createElement('div');
+            card.className = 'color-card';
+            
+            card.innerHTML = `
+                <div class="color-display" style="background-color: ${color.rgb}">${color.codigo}</div>
+                <div class="color-info">
+                    <div class="color-name">${color.nombre}</div>
+                    <div class="color-code">${color.codigo}</div>
+                </div>
+            `;
+            
+            card.addEventListener('click', () => mostrarModal(color));
+            return card;
+        }
+        
+        // Función para mostrar modal con detalles del color
+        function mostrarModal(color) {
+            const modal = document.getElementById('colorModal');
+            const colorDisplay = document.getElementById('modalColorDisplay');
+            const colorName = document.getElementById('modalColorName');
+            const colorCode = document.getElementById('modalColorCode');
+            const rgbValue = document.getElementById('modalRGBValue');
+            
+            colorDisplay.style.backgroundColor = color.rgb;
+            colorDisplay.textContent = color.codigo;
+            colorName.textContent = color.nombre;
+            colorCode.textContent = `Código: ${color.codigo}`;
+            rgbValue.textContent = `RGB: ${color.rgb}`;
+            
+            modal.style.display = 'flex';
+        }
+        
+        // Manejador del formulario mejorado
+        document.getElementById('rgbSearchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const rgbInput = document.getElementById('rgbInput').value.trim();
+            const resultado = buscarColorPorRGB(rgbInput);
+            const searchResult = document.getElementById('searchResult');
+            const searchedColorDisplay = document.getElementById('searchedColorDisplay');
+            const searchedColorInfo = document.getElementById('searchedColorInfo');
+            
+            if (resultado) {
+                searchedColorDisplay.style.backgroundColor = resultado.rgb;
+                searchedColorDisplay.textContent = resultado.codigo;
+                searchedColorInfo.innerHTML = `
+                    <div class="searched-color-name">${resultado.nombre}</div>
+                    <div class="searched-color-code">${resultado.rgb}</div>
+                `;
+                searchResult.style.display = 'block';
+            } else {
+                searchResult.style.display = 'block'; // Mostrar área de error
+            }
+        });
+        
+        // Cerrar modal
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('colorModal').style.display = 'none';
+        });
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        document.getElementById('colorModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('colorModal')) {
+                document.getElementById('colorModal').style.display = 'none';
+            }
+        });
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', renderizarColores);
+    </script>
+</body>
+</html>

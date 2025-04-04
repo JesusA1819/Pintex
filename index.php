@@ -139,6 +139,7 @@ $conexion->close();
             <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
             <div class="text-center mt-3">
                 <a href="registro.php" class="text-muted">¿No tienes una cuenta? Regístrate</a>
+               
             </div>
         </form>
     </div>
