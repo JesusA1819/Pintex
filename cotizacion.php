@@ -594,7 +594,7 @@ if ($proveedor_id > 0) {
 <body>
     <div class="header">
         <div class="container">
-            <h1><i class="fas fa-paint-roller"></i> Sistema de Cotizaciones - Vinimex®</h1>
+            <h1><i class="fas fa-paint-roller"></i> Sistema de Cotizaciones - Pintex®</h1>
             <p class="mb-0"><?php echo $proveedor_id > 0 ? 'Catálogo de ' . htmlspecialchars($proveedor['nombre']) : 'Seleccione un proveedor para comenzar'; ?></p>
         </div>
     </div>
