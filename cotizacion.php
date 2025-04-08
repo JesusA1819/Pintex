@@ -8,6 +8,10 @@ require 'includes.php';
 
 // Verificar si se ha seleccionado un proveedor
 $proveedor_id = isset($_GET['proveedor_id']) ? intval($_GET['proveedor_id']) : 0;
+$litrosPintura = isset($_GET['litros']) ? floatval($_GET['litros']) : 0;
+$areaPintura = isset($_GET['area']) ? floatval($_GET['area']) : 0;
+$tipoPintura = isset($_GET['tipoPintura']) ? htmlspecialchars($_GET['tipoPintura']) : ''; // <-- corregido
+$tipoProducto = isset($_GET['tipoProducto']) ? htmlspecialchars($_GET['tipoProducto']) : '';
 
 // Obtener parámetros de búsqueda
 $busqueda_proveedor = isset($_GET['busqueda_proveedor']) ? trim($_GET['busqueda_proveedor']) : '';
@@ -102,6 +106,16 @@ if ($proveedor_id > 0) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        .proveedor-descripcion {
+            font-size: 0.9rem;
+            color: #444;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* máximo 3 líneas */
+            -webkit-box-orient: vertical;
+            min-height: 3.6em;
+        }
         :root {
             --color-primario: #2c3e50;
             --color-secundario: #3498db;
@@ -584,7 +598,7 @@ if ($proveedor_id > 0) {
             <p class="mb-0"><?php echo $proveedor_id > 0 ? 'Catálogo de ' . htmlspecialchars($proveedor['nombre']) : 'Seleccione un proveedor para comenzar'; ?></p>
         </div>
     </div>
-    
+
     <div class="container">
         <?php if ($proveedor_id === 0): ?>
             <!-- Sección de búsqueda de proveedores -->
@@ -615,30 +629,103 @@ if ($proveedor_id > 0) {
                 </form>
             </div>
             
-            <h2 class="mb-4">Proveedores Disponibles</h2>
-            
+            <h2 class="mb-4">Proveedores Disponibles: </h2>
+            <?php
+            $tiposPintura = [
+                'interior' => 'Pintura Interior',
+                'exterior' => 'Pintura Exterior',
+                // más tipos si aplican
+            ];
+
+            $tiposProducto = [
+                'vinilica' => 'Vinílica',
+                'esmalte' => 'Esmalte',
+                // más tipos si aplican
+            ];
+?>
+            <div class="mt-2 mt-md-0">
+                <p class="mb-1"><strong><i class="fas fa-ruler-combined"></i> Área a pintar:</strong>
+                    <?php echo number_format($areaPintura, 2); ?> m²</p>
+                <p class="mb-1"><strong><i class="fas fa-paint-roller"></i> Tipo:</strong>
+                    <?php echo isset($tiposPintura[$tipoPintura]) ? $tiposPintura[$tipoPintura] : 'N/A'; ?>
+                    -
+                    <?php echo isset($tiposProducto[$tipoProducto]) ? $tiposProducto[$tipoProducto] : 'N/A'; ?>
+                </p>
+                <p class="mb-0"><strong><i class="fas fa-tint"></i> Litros necesarios:</strong>
+                    <span id="litros-necesarios" class="badge badge-litros" style='color: black;'><?php echo number_format($litrosPintura, 1); ?></span>
+                  
+                </p>
+            </div>
             <?php if (count($proveedores) === 0): ?>
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i> No se encontraron proveedores con los criterios de búsqueda
                 </div>
             <?php else: ?>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                    <?php foreach ($proveedores as $prov): ?>
-                        <div class="col">
-                            <div class="proveedor-card h-100">
-                                <img src="<?php echo !empty($prov['logo']) ? htmlspecialchars($prov['logo']) : 'https://via.placeholder.com/100?text=' . urlencode(substr($prov['nombre'], 0, 1)); ?>" 
-                                     alt="<?php echo htmlspecialchars($prov['nombre']); ?>" 
-                                     class="proveedor-logo img-fluid">
-                                <h3 class="proveedor-nombre"><?php echo htmlspecialchars($prov['nombre']); ?></h3>
-                                <p class="proveedor-info"><i class="fas fa-phone me-2"></i><?php echo htmlspecialchars($prov['telefono'] ?? 'N/A'); ?></p>
-                                <p class="proveedor-info"><i class="fas fa-map-marker-alt me-2"></i><?php echo htmlspecialchars($prov['direccion'] ?? 'N/A'); ?></p>
-                                <p class="proveedor-descripcion"><?php echo htmlspecialchars($prov['descripcion'] ?? 'Sin descripción'); ?></p>
-                                <a href="?proveedor_id=<?php echo $prov['id']; ?>" class="btn btn-cotizar">
-                                    <i class="fas fa-clipboard-list"></i> Ver Catálogo
-                                </a>
-                            </div>
+                <?php foreach ($proveedores as $prov): ?>
+                    <div class="col">
+                        <div class="proveedor-card h-100">
+                            <img src="<?php echo !empty($prov['logo']) ? htmlspecialchars($prov['logo']) : 'https://via.placeholder.com/100?text=' . urlencode(substr($prov['nombre'], 0, 1)); ?>" 
+                                alt="<?php echo htmlspecialchars($prov['nombre']); ?>" 
+                                class="proveedor-logo img-fluid">
+                            <h3 class="proveedor-nombre"><?php echo htmlspecialchars($prov['nombre']); ?></h3>
+                            <p class="proveedor-info"><i class="fas fa-phone me-2"></i><?php echo htmlspecialchars($prov['telefono'] ?? 'N/A'); ?></p>
+                            <p class="proveedor-info"><i class="fas fa-map-marker-alt me-2"></i><?php echo htmlspecialchars($prov['direccion'] ?? 'N/A'); ?></p>
+                            <p class="proveedor-descripcion"><?php echo htmlspecialchars($prov['descripcion'] ?? 'Sin descripción'); ?></p>
+                            <button class="btn btn-sm btn-link" onclick="this.previousElementSibling.style.webkitLineClamp='unset'; this.style.display='none';">Leer más</button>
+
+                            <a href="?proveedor_id=<?php echo $prov['id']; ?>" class="btn btn-cotizar">
+                                <i class="fas fa-clipboard-list"></i> Ver Catálogo
+                            </a>
                         </div>
-                    <?php endforeach; ?>
+
+                        <?php
+                        // CONSULTA DE PRODUCTOS POR PROVEEDOR
+                        $query = "SELECT s.*, a.* 
+                                FROM productos s
+                                INNER JOIN pinturas a ON s.id = a.producto_id 
+                                WHERE s.provedor_id = " . intval($prov['id']);
+
+                        $result = mysqli_query($conexion, $query);
+                        ?>
+
+                        <div class="mt-4">
+                            <?php if ($result && mysqli_num_rows($result) > 0): ?>
+                                <h4>Productos y Pinturas del Proveedor</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th>Tipo de Pintura</th>
+                                                <th>Litros</th>
+                                                <th>Precio Unitario</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php while ($row = mysqli_fetch_assoc($result)): 
+                                                $nombreProducto = htmlspecialchars($row['nombre']);
+                                                $tipoPintura = htmlspecialchars($row['tipo'] ?? 'N/A');
+                                                $tamano = htmlspecialchars($row['tamano'] ?? 'N/D');
+                                                $precio = number_format($row['precio'], 2);
+                                            ?>
+                                            <tr>
+                                                <td><?= $nombreProducto ?></td>
+                                                <td><?= $tipoPintura ?></td>                                                
+                                                <th><?= $tamano ?></th>
+                                                <td>$<?= $precio ?></td>
+                                            </tr>
+                                            <?php endwhile; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php else: ?>
+                                <div class="alert alert-warning mt-3">No se encontraron productos ni pinturas para este proveedor.</div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+
                 </div>
             <?php endif; ?>
             
@@ -648,28 +735,32 @@ if ($proveedor_id > 0) {
                 <i class="fas fa-arrow-left"></i> Regresar a proveedores
             </a>
             
-            <!-- Información del proveedor -->
-            <div class="proveedor-info bg-white p-4 rounded shadow-sm mb-4">
-                <div class="row align-items-center">
-                    <div class="col-md-2 text-center">
-                        <img src="<?php echo !empty($proveedor['logo']) ? htmlspecialchars($proveedor['logo']) : 'https://via.placeholder.com/100?text=' . urlencode(substr($proveedor['nombre'], 0, 1)); ?>" 
-                             alt="<?php echo htmlspecialchars($proveedor['nombre']); ?>" 
-                             class="img-fluid rounded-circle" style="max-width: 80px;">
-                    </div>
-                    <div class="col-md-10">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h3><i class="fas fa-building me-2"></i><?php echo htmlspecialchars($proveedor['nombre']); ?></h3>
-                                <p><i class="fas fa-phone me-2"></i><?php echo htmlspecialchars($proveedor['telefono'] ?? 'N/A'); ?></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><i class="fas fa-map-marker-alt me-2"></i><?php echo htmlspecialchars($proveedor['direccion'] ?? 'N/A'); ?></p>
-                                <p><i class="fas fa-info-circle me-2"></i><?php echo htmlspecialchars($proveedor['descripcion'] ?? 'Sin descripción'); ?></p>
-                            </div>
-                        </div>
-                    </div>
+           <!-- Información del proveedor -->
+<div class="proveedor-info bg-white p-4 rounded shadow-sm mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-2 text-center">
+            <img src="<?php echo !empty($proveedor['logo']) 
+                ? htmlspecialchars($proveedor['logo']) 
+                : 'https://via.placeholder.com/100?text=' . urlencode(substr($proveedor['nombre'], 0, 1)); ?>" 
+                alt="<?php echo htmlspecialchars($proveedor['nombre']); ?>" 
+                class="img-fluid rounded-circle" style="max-width: 80px;">
+        </div>
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3><i class="fas fa-building me-2"></i><?php echo htmlspecialchars($proveedor['nombre']); ?></h3>
+                    <p><i class="fas fa-phone me-2"></i><?php echo htmlspecialchars($proveedor['telefono'] ?? 'N/A'); ?></p>
+                </div>
+                <div class="col-md-6">
+                    <p><i class="fas fa-map-marker-alt me-2"></i><?php echo htmlspecialchars($proveedor['direccion'] ?? 'N/A'); ?></p>
+                    <p><i class="fas fa-info-circle me-2"></i><?php echo htmlspecialchars($proveedor['descripcion'] ?? 'Sin descripción'); ?></p>
                 </div>
             </div>
+        </div>
+    </div>
+
+</div>
+
             
             <!-- Sección de búsqueda de productos -->
             <div class="search-section mb-4">
