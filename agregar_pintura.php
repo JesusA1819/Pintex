@@ -52,16 +52,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $marca = trim($_POST['marca'] ?? '');
     $tamano = $_POST['tamano'] ?? '';
     $tipo_pintura = $_POST['tipo'] ?? '';
-    $colores = json_decode($_POST['colores_json'] ?? '[]', true);
 
     // Validación robusta de campos
     $errores = [];
-    if (empty($nombre)) $errores[] = "El nombre del producto es requerido";
-    if ($precio === false || $precio <= 0) $errores[] = "Ingrese un precio válido mayor a 0";
-    if (empty($marca)) $errores[] = "La marca es requerida";
-    if (empty($tamano)) $errores[] = "Seleccione un tamaño";
-    if (empty($tipo_pintura)) $errores[] = "Seleccione un tipo de pintura";
-    
+    if (empty($nombre))
+        $errores[] = "El nombre del producto es requerido";
+    if ($precio === false || $precio <= 0)
+        $errores[] = "Ingrese un precio válido mayor a 0";
+    if (empty($marca))
+        $errores[] = "La marca es requerida";
+    if (empty($tamano))
+        $errores[] = "Seleccione un tamaño";
+    if (empty($tipo_pintura))
+        $errores[] = "Seleccione un tipo de pintura";
+
     // Validación de imagen
     $imagen_path = null;
     if (!isset($_FILES['imagen']) || $_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
@@ -72,11 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($file_type, $allowed_types)) {
             $errores[] = "Solo se permiten imágenes JPEG, PNG o GIF";
         }
-    }
-
-    // Validación de colores
-    if (empty($colores)) {
-        $errores[] = "Debe agregar al menos un color";
     }
 
     // Si hay errores, mostrar y redireccionar
@@ -91,68 +90,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!file_exists($upload_dir)) {
         mkdir($upload_dir, 0777, true);
     }
-    
+
     $file_name = uniqid() . '_' . basename($_FILES['imagen']['name']);
     $target_path = $upload_dir . $file_name;
-    
+
     if (move_uploaded_file($_FILES['imagen']['tmp_name'], $target_path)) {
         $imagen_path = $target_path;
     }
 
     // Insertar en la base de datos usando transacciones
     mysqli_begin_transaction($conexion);
-    
+
     try {
         // Insertar en productos (CORRECCIÓN: usar provedor_id)
         $query = "INSERT INTO productos (provedor_id, nombre, precio, tipo, imagen) VALUES (?, ?, ?, 1, ?)";
         $stmt = mysqli_prepare($conexion, $query);
-  
+
         if (!$stmt) {
             throw new Exception("Error al preparar la consulta de productos: " . mysqli_error($conexion));
         }
-        
+
         mysqli_stmt_bind_param($stmt, 'isds', $proveedor_id, $nombre, $precio, $imagen_path);
-        
+
         if (!mysqli_stmt_execute($stmt)) {
             throw new Exception("Error al ejecutar la consulta de productos: " . mysqli_stmt_error($stmt));
         }
-        
+
         $producto_id = mysqli_insert_id($conexion);
         mysqli_stmt_close($stmt);
 
         // Insertar en tabla pinturas (CORRECCIÓN: usar tannano)
-        $query = "INSERT INTO pinturas (producto_id, marca, tamano, tipo) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO pinturas (proveedor_id, marca, tamano, tipo) VALUES (?, ?, ?, ?)";
         $stmt = mysqli_prepare($conexion, $query);
-        
+
         if (!$stmt) {
             throw new Exception("Error al preparar la consulta de pinturas: " . mysqli_error($conexion));
         }
-        
-        mysqli_stmt_bind_param($stmt, 'isss', $producto_id, $marca, $tamano, $tipo_pintura);
-        
+
+        mysqli_stmt_bind_param($stmt, 'isss', $proveedor_id, $marca, $tamano, $tipo_pintura);
+
         if (!mysqli_stmt_execute($stmt)) {
             throw new Exception("Error al ejecutar la consulta de pinturas: " . mysqli_stmt_error($stmt));
         }
-        
+
         $pintura_id = mysqli_insert_id($conexion);
         mysqli_stmt_close($stmt);
 
         // Insertar colores
         foreach ($colores as $color) {
-            if (!empty($color['nombre']) && !empty($color['rgb'])) {
-                $query = "INSERT INTO colores_pintura (pintura_id, nombre_color, codigo_rgb) VALUES (?, ?, ?)";
+            if (!empty($color['nombre'])) {
+                $query = "INSERT INTO colores_pintura (pintura_id, nombre_color) VALUES (?, ?, ?)";
                 $stmt = mysqli_prepare($conexion, $query);
-                
+
                 if (!$stmt) {
                     throw new Exception("Error al preparar la consulta de colores: " . mysqli_error($conexion));
                 }
-                
-                mysqli_stmt_bind_param($stmt, 'iss', $pintura_id, $color['nombre'], $color['rgb']);
-                
+
+                mysqli_stmt_bind_param($stmt, 'iss', $pintura_id, $color['nombre']);
+
                 if (!mysqli_stmt_execute($stmt)) {
                     throw new Exception("Error al ejecutar la consulta de colores: " . mysqli_stmt_error($stmt));
                 }
-                
+
                 mysqli_stmt_close($stmt);
             }
         }
@@ -162,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['exito'] = "Pintura guardada correctamente";
         header("Location: adm.php");
         exit();
-        
+
     } catch (Exception $e) {
         // Revertir transacción en caso de error
         mysqli_rollback($conexion);
@@ -175,6 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -186,34 +186,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 0;
             padding: 20px;
         }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             color: #333;
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input, select {
+
+        input,
+        select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         .btn-submit {
             background-color: #4CAF50;
             color: white;
@@ -223,9 +230,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
             font-size: 16px;
         }
+
         .btn-submit:hover {
             background-color: #45a049;
         }
+
         .error {
             color: #f44336;
             margin-bottom: 15px;
@@ -233,6 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #ffebee;
             border-radius: 4px;
         }
+
         .color-preview {
             width: 30px;
             height: 30px;
@@ -242,19 +252,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             vertical-align: middle;
             border: 1px solid #ccc;
         }
+
         .color-item {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
+
         .color-inputs {
             display: flex;
             gap: 10px;
             flex-grow: 1;
         }
+
         .color-inputs input {
             flex: 1;
         }
+
         .remove-color {
             background-color: #f44336;
             color: white;
@@ -265,9 +279,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
             margin-left: 10px;
         }
+
         #colores-container {
             margin-top: 20px;
         }
+
         #add-color {
             margin-top: 10px;
             background-color: #2196F3;
@@ -279,43 +295,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Agregar Nueva Pintura</h1>
         <p>Proveedor: <strong><?= htmlspecialchars($proveedor_nombre) ?></strong></p>
-        
+
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="error"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <div class="error"><?= $_SESSION['error'];
+            unset($_SESSION['error']); ?></div>
         <?php endif; ?>
-        
+
         <form method="POST" action="" enctype="multipart/form-data" id="pinturaForm">
             <input type="hidden" name="proveedor_id" value="<?= $proveedor_id ?>">
-            
+
             <div class="form-group">
                 <label for="nombre">Nombre del Producto:</label>
                 <input type="text" id="nombre" name="nombre" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="precio">Precio:</label>
                 <input type="number" id="precio" name="precio" step="0.01" min="0.01" required>
             </div>
-            
+                
             <div class="form-group">
                 <label for="marca">Marca:</label>
                 <input type="text" id="marca" name="marca" required>
             </div>
             
+
             <div class="form-group">
                 <label for="tamano">Tamaño:</label>
                 <select id="tamano" name="tamano" required>
                     <option value="">Seleccione un tamaño</option>
-                    <option value="1lt">1 litro</option>
-                    <option value="5lts">Galón (5 litros)</option>
-                    <option value="20lts">Cubeta (20 litros)</option>
+                    <option value="1">1 litro</option>
+                    <option value="5">Galón (5 litros)</option>
+                    <option value="20">Cubeta (20 litros)</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="tipo">Tipo de Pintura:</label>
                 <select id="tipo" name="tipo" required>
@@ -325,128 +344,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="base agua">Base agua</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="imagen">Imagen del Producto:</label>
                 <input type="file" id="imagen" name="imagen" accept="image/*" required>
             </div>
-            
-            <div class="form-group">
-                <label>Colores Disponibles:</label>
-                <div id="colores-container">
-                    <!-- Los colores se agregarán aquí dinámicamente -->
-                </div>
-                <button type="button" id="add-color">Agregar Color</button>
-                <input type="hidden" id="colores_json" name="colores_json">
-            </div>
-            
+
             <button type="submit" class="btn-submit">Guardar Pintura</button>
         </form>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Función para actualizar el color de vista previa
-            function updateColorPreview(input, preview) {
-                const rgbValue = input.value;
-                if (rgbValue.match(/^rgb\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\)$/)) {
-                    preview.style.backgroundColor = rgbValue;
-                }
-            }
-
-            // Función para agregar un nuevo campo de color
-            function addColorField(nombre = '', rgb = '') {
-                const container = document.getElementById('colores-container');
-                const colorId = Date.now();
-                
-                const colorItem = document.createElement('div');
-                colorItem.className = 'color-item';
-                
-                const colorInputs = document.createElement('div');
-                colorInputs.className = 'color-inputs';
-                
-                const nombreInput = document.createElement('input');
-                nombreInput.type = 'text';
-                nombreInput.placeholder = 'Nombre del color';
-                nombreInput.value = nombre;
-                
-                const rgbInput = document.createElement('input');
-                rgbInput.type = 'text';
-                rgbInput.placeholder = 'rgb(R, G, B)';
-                rgbInput.value = rgb;
-                
-                const preview = document.createElement('div');
-                preview.className = 'color-preview';
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className = 'remove-color';
-                removeBtn.innerHTML = '×';
-                removeBtn.addEventListener('click', function() {
-                    container.removeChild(colorItem);
-                    updateColorsJSON();
-                });
-                
-                // Configurar eventos
-                rgbInput.addEventListener('input', function() {
-                    updateColorPreview(this, preview);
-                    updateColorsJSON();
-                });
-                
-                nombreInput.addEventListener('input', updateColorsJSON);
-                
-                // Construir estructura
-                colorInputs.appendChild(nombreInput);
-                colorInputs.appendChild(rgbInput);
-                
-                colorItem.appendChild(colorInputs);
-                colorItem.appendChild(preview);
-                colorItem.appendChild(removeBtn);
-                
-                container.appendChild(colorItem);
-                
-                // Actualizar vista previa inicial
-                if (rgb) updateColorPreview(rgbInput, preview);
-            }
-
-            // Función para actualizar el JSON oculto
-            function updateColorsJSON() {
-                const colorItems = document.querySelectorAll('.color-item');
-                const colors = [];
-                
-                colorItems.forEach(item => {
-                    const nombre = item.querySelector('input[type="text"]').value;
-                    const rgb = item.querySelector('input[type="text"]:last-child').value;
-                    if (nombre && rgb) {
-                        colors.push({ nombre, rgb });
-                    }
-                });
-                
-                document.getElementById('colores_json').value = JSON.stringify(colors);
-            }
-
-            // Evento para agregar nuevo color
-            document.getElementById('add-color').addEventListener('click', function() {
-                addColorField();
-            });
-
-            // Validación antes de enviar el formulario
-            document.getElementById('pinturaForm').addEventListener('submit', function(e) {
-                updateColorsJSON();
-                const colores = JSON.parse(document.getElementById('colores_json').value);
-                
-                if (colores.length === 0) {
-                    e.preventDefault();
-                    alert('Debe agregar al menos un color');
-                    return false;
-                }
-                
-                return true;
-            });
-
-            // Agregar un color inicial al cargar la página
-            addColorField();
-        });
-    </script>
 </body>
+
 </html>
