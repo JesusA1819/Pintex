@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🖌 Principal • Pintex</title>
-    <link rel="icon" href="../imagen/pintex.ico" type="image/x-icon">
+    <title>Pintex - Calculadora de Pintura</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" href="pintex.ico" type="image/x-icon">
     <style>
@@ -23,7 +22,7 @@
         }
         header h1 {
             font-size: 3rem;
-            text-align: center; /* Centrar el título */
+            text-align: center;
         }
         .nav-link {
             color: white !important;
@@ -38,56 +37,120 @@
         .catalog-container {
             display: flex;
             justify-content: space-around;
+            flex-wrap: wrap;
             margin-top: 40px;
         }
         .catalog-item {
             text-align: center;
             width: 30%;
+            min-width: 300px;
             background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .catalog-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         .catalog-item img {
             max-width: 100%;
+            height: 180px;
+            object-fit: contain;
             border-radius: 8px;
         }
+        .product-price {
+            font-weight: bold;
+            color: #198754;
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+        .product-brand {
+            color: #666;
+            font-size: 0.9rem;
+        }
         .btn-comenzar {
-            display: block;
-            margin: 40px auto; /* Centrar el botón */
-            background-color: #28a745;
+            display: inline-block;
+            background-color: #ff9800;
             color: white;
             font-weight: bold;
             border-radius: 5px;
             padding: 10px 20px;
             text-align: center;
             transition: background-color 0.3s;
+            text-decoration: none;
+            margin: 20px auto;
         }
         .btn-comenzar:hover {
-            background-color: #218838;
+            background-color: #e68900;
+            color: white;
+        }
+        .footer {
+            background-color: #00a4e4;
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .footer-section {
+            margin-bottom: 20px;
+        }
+        #about {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        #about div {
+            flex: 1;
+            min-width: 300px;
+        }
+        #about img {
+            max-width: 40%;
+            margin-left: 20px;
+        }
+        @media (max-width: 768px) {
+            #about img {
+                max-width: 100%;
+                margin-left: 0;
+                margin-top: 20px;
+            }
+            .catalog-item {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="container">
-            <div class="d-flex flex-column align-items-center">
-                <img src="imagen/logo.jpg" alt="Logo" class="logo">
-                <h1>Pintex</h1>
-            </div>
-            <p class="text-center">Calcula la cantidad exacta de pintura que necesitas para tu proyecto.</p>
+<header>
+    <div class="container">
+        <div class="d-flex flex-column align-items-center">
+            <img src="imagen/logo.jpg" alt="Logo" class="logo">
+            <h1>Pintex</h1>
         </div>
-    </header>
-    
+        <p class="text-center">Calcula la cantidad exacta de pintura que necesitas para tu proyecto.</p>
+    </div>
+</header>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-primary">
     <div class="container">
         <a class="navbar-brand text-white" href="#">Pintex</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="#about">¿Quiénes Somos?</a></li>
-                <li class="nav-item"><a class="nav-link" href="http://localhost/pintex/registro.php">Calculadora</a></li>
+                <li class="nav-item"><a class="nav-link" href="registro.php">Calculadora</a></li>
                 <li class="nav-item"><a class="nav-link" href="#catalog">Catálogo</a></li>
             </ul>
         </div>
@@ -96,38 +159,92 @@
 
 <main class="container mt-4">
     <section id="about">
-        <h2>¿Quiénes Somos?</h2>
-        <p>Pintex es una herramienta en línea diseñada para ayudarte a calcular la cantidad exacta de pintura que necesitarás para tu próximo proyecto...</p>
-    </section>
-
-    <section id="intro">
-        <div class="text-center">
-            <img src="imagen/indexx.jpg" alt="Pintura" class="intro-image">
+        <div>
+            <h2>¿Quiénes Somos?</h2>
+            <p>Pintex es una herramienta digital creada para ayudarte a calcular de manera rápida y precisa la cantidad de pintura que necesitas para tus proyectos. Nuestra misión es simplificar el proceso de planeación en trabajos de pintura, brindando soluciones inteligentes que ahorran tiempo, dinero y esfuerzo.</p>
             <p>Calcula de forma sencilla la cantidad exacta de pintura para tu hogar, oficina o proyecto, sin desperdicios.</p>
         </div>
+        <img src="imagen/indexx.jpg" alt="Pintura" class="intro-image">
     </section>
 
     <section id="catalog">
         <h2>Catálogo de Materiales</h2>
         <div class="catalog-container">
-            <div class="catalog-item">
-                <img src="imagen/brocha.png" alt="Brocha">
-                <p>Brocha - Aplicación más uniforme y suave.</p>
+            <div class="catalog-item" onclick="window.location.href='index.php'">
+                <img src="imagen/acrilica.jpg" alt="Pintura Vinimex">
+                <h4>Vinimex Vinil Acrílico</h4>
+                <p class="product-brand">Comex</p>
+                <p>Pintura de alto rendimiento para interiores y exteriores</p>
+                <div class="product-price">$1,250.00 MXN</div>
             </div>
-            <div class="catalog-item">
-                <img src="imagen/pintura.jpg" alt="Pintura">
-                <p>Pintura - Mejor apariencia y protección.</p>
+            
+            <div class="catalog-item" onclick="window.location.href='index.php'">
+                <img src="imagen/latex.jpg" alt="Pintura Latex">
+                <h4>Latex Exterior Super</h4>
+                <p class="product-brand">Sherwin-Williams</p>
+                <p>Pintura acrílica de máxima durabilidad para exteriores</p>
+                <div class="product-price">$1,480.00 MXN</div>
             </div>
-            <div class="catalog-item">
-                <img src="imagen/rodillo.jpg" alt="Rodillo">
-                <p>Rodillo - Cubre grandes áreas eficientemente.</p>
+            
+            <div class="catalog-item" onclick="window.location.href='index.php'">
+                <img src="imagen/berelacrilico.jpg" alt="Pintura Berel">
+                <h4>Berel Ultra Acrílico</h4>
+                <p class="product-brand">Berel</p>
+                <p>Pintura 100% acrílica con protección contra hongos y algas</p>
+                <div class="product-price">$1,150.00 MXN</div>
+            </div>
+            
+            <div class="catalog-item" onclick="window.location.href='index.php'">
+                <img src="imagen/piitt.jpg" alt="Pintura PPG">
+                <h4>PPG Pitt-Arch</h4>
+                <p class="product-brand">PPG</p>
+                <p>Pintura arquitectónica de alto desempeño para profesionales</p>
+                <div class="product-price">$1,320.00 MXN</div>
+            </div>
+            
+            <div class="catalog-item" onclick="window.location.href='index.php'">
+                <img src="imagen/brocha.jpg" alt="Brocha Comex">
+                <h4>Brocha Sintética 4"</h4>
+                <p class="product-brand">Comex</p>
+                <p>Brocha profesional para aplicación de pinturas base agua</p>
+                <div class="product-price">$85.00 MXN</div>
+            </div>
+            
+            <div class="catalog-item" onclick="window.location.href='index.php'">
+                <img src="imagen/rodillo.jpg" alt="Rodillo Purdy">
+                <h4>Rodillo Purdy 3/8"</h4>
+                <p class="product-brand">Purdy</p>
+                <p>Rodillo profesional de lana para acabado suave</p>
+                <div class="product-price">$120.00 MXN</div>
             </div>
         </div>
+        
+        <div class="text-center">
+            <a href="registro.php" class="btn-comenzar">Comenzar Cálculo</a>
+        </div>
     </section>
-
-    <!-- Botón "Comenzar Cálculo" -->
-    <a href="http://localhost/pintex/registro.php" class="btn-comenzar">Comenzar Cálculo</a>
 </main>
+
+<footer class="footer">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-4 footer-section">
+                <h5>Acerca de Pintex</h5>
+                <a href="#about">¿Quiénes somos?</a><br>
+                <a href="#catalog">Nuestro catálogo</a>
+            </div>
+            <div class="col-md-4 footer-section">
+                <h5>Ayuda</h5>
+                <a href="#">Preguntas frecuentes</a><br>
+                <a href="#">Contacto</a>
+            </div>
+            <div class="col-md-4 footer-section">
+                <h5>Síguenos</h5>
+                <a href="#">Facebook</a> | <a href="#">Instagram</a> | <a href="#">Twitter</a>
+            </div>
+        </div>
+    </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
 
