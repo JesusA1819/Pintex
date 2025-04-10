@@ -4,7 +4,7 @@
 // Credenciales de acceso a la base de datos
 $DATABASE_HOST = 'localhost';      // Servidor de la base de datos
 $DATABASE_USER = 'root';           // Usuario de la base de datos
-$DATABASE_PASS = '123456';           // Contraseña de la base de datos
+$DATABASE_PASS = 'root';           // Contraseña de la base de datos
 $DATABASE_NAME = 'pintex_db';      // Nombre de la base de datos
 
 // Conexión a la base de datos
