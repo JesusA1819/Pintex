@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id']) || !$_SESSION['es_administrador']) {
     header('Location: index.php');
     exit();
 }
-
+ 
 // Obtener y validar ID del proveedor
 $proveedor_id = filter_input(INPUT_GET, 'proveedor_id', FILTER_VALIDATE_INT);
 if (!$proveedor_id) {
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $marca = trim($_POST['marca'] ?? '');
     $tamano = $_POST['tamano'] ?? '';
     $tipo_pintura = $_POST['tipo'] ?? '';
-
+    $precio = $_POST['precio'] ?? '';
     // Validación robusta de campos
     $errores = [];
     if (empty($nombre))
@@ -65,6 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = "Seleccione un tamaño";
     if (empty($tipo_pintura))
         $errores[] = "Seleccione un tipo de pintura";
+    if (empty($precio))
+    $errores[] = "Ingrese un precio";
 
     // Validación de imagen
     $imagen_path = null;
@@ -102,58 +104,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_begin_transaction($conexion);
 
     try {
-        // Insertar en productos (CORRECCIÓN: usar provedor_id)
-        $query = "INSERT INTO productos (provedor_id, nombre, precio, tipo, imagen) VALUES (?, ?, ?, 1, ?)";
-        $stmt = mysqli_prepare($conexion, $query);
-
-        if (!$stmt) {
-            throw new Exception("Error al preparar la consulta de productos: " . mysqli_error($conexion));
-        }
-
-        mysqli_stmt_bind_param($stmt, 'isds', $proveedor_id, $nombre, $precio, $imagen_path);
-
-        if (!mysqli_stmt_execute($stmt)) {
-            throw new Exception("Error al ejecutar la consulta de productos: " . mysqli_stmt_error($stmt));
-        }
-
-        $producto_id = mysqli_insert_id($conexion);
-        mysqli_stmt_close($stmt);
+        
 
         // Insertar en tabla pinturas (CORRECCIÓN: usar tannano)
-        $query = "INSERT INTO pinturas (proveedor_id, marca, tamano, tipo) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO pinturas (proveedor_id, marca, tamano, tipo, precio) VALUES (?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conexion, $query);
 
         if (!$stmt) {
             throw new Exception("Error al preparar la consulta de pinturas: " . mysqli_error($conexion));
         }
 
-        mysqli_stmt_bind_param($stmt, 'isss', $proveedor_id, $marca, $tamano, $tipo_pintura);
+        mysqli_stmt_bind_param($stmt, 'isssi', $proveedor_id, $marca, $tamano, $tipo_pintura, $precio);
 
         if (!mysqli_stmt_execute($stmt)) {
             throw new Exception("Error al ejecutar la consulta de pinturas: " . mysqli_stmt_error($stmt));
-        }
-
-        $pintura_id = mysqli_insert_id($conexion);
-        mysqli_stmt_close($stmt);
-
-        // Insertar colores
-        foreach ($colores as $color) {
-            if (!empty($color['nombre'])) {
-                $query = "INSERT INTO colores_pintura (pintura_id, nombre_color) VALUES (?, ?, ?)";
-                $stmt = mysqli_prepare($conexion, $query);
-
-                if (!$stmt) {
-                    throw new Exception("Error al preparar la consulta de colores: " . mysqli_error($conexion));
-                }
-
-                mysqli_stmt_bind_param($stmt, 'iss', $pintura_id, $color['nombre']);
-
-                if (!mysqli_stmt_execute($stmt)) {
-                    throw new Exception("Error al ejecutar la consulta de colores: " . mysqli_stmt_error($stmt));
-                }
-
-                mysqli_stmt_close($stmt);
-            }
         }
 
         // Confirmar transacción
