@@ -27,9 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               VALUES ('$nombre', '$telefono', '$direccion', '$colonia', " . ($logo_path ? "'$logo_path'" : "NULL") . ")";
     
     if (mysqli_query($conexion, $query)) {
-        header("Location: admin_panel.php?mensaje=Proveedor registrado correctamente");
+        header("Location: adm.php?mensaje=Proveedor registrado correctamente");
     } else {
-        header("Location: admin_panel.php?mensaje=Error al registrar proveedor: " . urlencode(mysqli_error($conexion)));
+        header("Location: adm.php?mensaje=Error al registrar proveedor: " . urlencode(mysqli_error($conexion)));
     }
     exit();
 }

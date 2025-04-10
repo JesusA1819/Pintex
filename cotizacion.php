@@ -57,44 +57,73 @@ if ($proveedor_id > 0) {
     if (!$proveedor) {
         die("Proveedor no encontrado");
     }
+// Parámetros básicos
+$busqueda_producto = isset($_GET['busqueda_producto']) ? trim($_GET['busqueda_producto']) : '';
+$proveedor_id = isset($_GET['proveedor_id']) ? (int)$_GET['proveedor_id'] : 0;
 
-    // Consulta para obtener los productos del proveedor
-    $busqueda_producto = isset($_GET['busqueda_producto']) ? trim($_GET['busqueda_producto']) : '';
+$limite_por_pagina = 10; // Número de elementos por página
+$paginaActual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$offset = ($paginaActual - 1) * $limite_por_pagina;
 
-    $query_productos = "SELECT p.*, pr.nombre as proveedor_nombre 
-                       FROM productos p
-                       JOIN proveedores pr ON p.provedor_id = pr.id
-                       WHERE p.provedor_id = ?";
+// Consulta para obtener los productos
+$query_productos = "SELECT p.*, pr.nombre as proveedor_nombre 
+                   FROM productos p
+                   JOIN proveedores pr ON p.provedor_id = pr.id
+                   WHERE p.provedor_id = ?";
+$params_productos = [$proveedor_id];
+$types_productos = 'i';
 
-    $params_productos = [$proveedor_id];
-    $types_productos = 'i';
+if (!empty($busqueda_producto)) {
+    $query_productos .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.sku LIKE ?)";
+    $params_productos[] = "%$busqueda_producto%";
+    $params_productos[] = "%$busqueda_producto%";
+    $params_productos[] = "%$busqueda_producto%";
+    $types_productos .= 'sss';
+}
 
-    if (!empty($busqueda_producto)) {
-        $query_productos .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.sku LIKE ?)";
-        $params_productos[] = "%$busqueda_producto%";
-        $params_productos[] = "%$busqueda_producto%";
-        $params_productos[] = "%$busqueda_producto%";
-        $types_productos .= 'sss';
-    }
+$query_productos .= " ORDER BY p.nombre LIMIT ? OFFSET ?";
+$params_productos[] = $limite_por_pagina;
+$params_productos[] = $offset;
+$types_productos .= 'ii';
 
-    $query_productos .= " ORDER BY p.nombre";
+$stmt_productos = $conexion->prepare($query_productos);
+$stmt_productos->bind_param($types_productos, ...$params_productos);
+$stmt_productos->execute();
+$result_productos = $stmt_productos->get_result();
+$productos = $result_productos->fetch_all(MYSQLI_ASSOC);
 
-    $stmt_productos = $conexion->prepare($query_productos);
-    $stmt_productos->bind_param($types_productos, ...$params_productos);
-    $stmt_productos->execute();
-    $result_productos = $stmt_productos->get_result();
-    $productos = $result_productos->fetch_all(MYSQLI_ASSOC);
+// Consulta para obtener las pinturas
+$query_pinturas = "SELECT id, marca, tamano, precio, tipo, rol FROM pinturas WHERE proveedor_id = ? LIMIT ? OFFSET ?";
+$params_pinturas = [$proveedor_id, $limite_por_pagina, $offset];
+$types_pinturas = 'iii';
 
-    // Consulta para obtener categorías disponibles
-    $stmt_categorias = $conexion->prepare("
-        SELECT DISTINCT categoria 
-        FROM productos 
-        WHERE provedor_id = ? AND categoria IS NOT NULL
-    ");
-    $stmt_categorias->bind_param('i', $proveedor_id);
-    $stmt_categorias->execute();
-    $result_categorias = $stmt_categorias->get_result();
-    $categorias = array_column($result_categorias->fetch_all(), 0);
+$stmt_pinturas = $conexion->prepare($query_pinturas);
+$stmt_pinturas->bind_param($types_pinturas, ...$params_pinturas);
+$stmt_pinturas->execute();
+$result_pinturas = $stmt_pinturas->get_result();
+$pinturas = $result_pinturas->fetch_all(MYSQLI_ASSOC);
+
+// Combinamos productos y pinturas
+$items = array_merge($productos, $pinturas);
+
+// Calculamos el total de elementos para la paginación
+$query_count_productos = "SELECT COUNT(*) FROM productos WHERE provedor_id = ?";
+$stmt_count_productos = $conexion->prepare($query_count_productos);
+$stmt_count_productos->bind_param('i', $proveedor_id);
+$stmt_count_productos->execute();
+$result_count_productos = $stmt_count_productos->get_result();
+$total_productos = $result_count_productos->fetch_row()[0];
+
+$query_count_pinturas = "SELECT COUNT(*) FROM pinturas WHERE proveedor_id = ?";
+$stmt_count_pinturas = $conexion->prepare($query_count_pinturas);
+$stmt_count_pinturas->bind_param('i', $proveedor_id);
+$stmt_count_pinturas->execute();
+$result_count_pinturas = $stmt_count_pinturas->get_result();
+$total_pinturas = $result_count_pinturas->fetch_row()[0];
+
+$total_items = $total_productos + $total_pinturas;
+$totalPaginas = ceil($total_items / $limite_por_pagina);
+
 }
 // Logica para determinar la cantidad de brochas y pinturas a agregar al carrito
 $brochas_a_agregar = ceil($litrosPintura / 20);  // Cada 20 litros, 1 brocha
@@ -111,8 +140,39 @@ $litros_a_agregar = $litrosPintura;  // La cantidad de pintura es el mismo núme
     <title>🖌 Proveedores • Pintex</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <link href="style1.css" rel="stylesheet">
     <link rel="icon" href="pintex.ico" type="image/x-icon">
+    <!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- jsPDF AutoTable plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+    .producto-imagen {
+        min-width: 100px; /* Ancho mínimo para la imagen */
+        text-align: right; /* Alinea la imagen a la derecha */
+    }
+    
+    .producto-imagen img {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: cover;
+        width: 100%;
+        height: auto;
+    }
+    
+    .producto-card {
+        padding: 15px;
+    }
+    
+    .producto-acciones {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+    }
+</style>
 </head>
 
 <body>
@@ -356,92 +416,113 @@ $litros_a_agregar = $litrosPintura;  // La cantidad de pintura es el mismo núme
                     <span class="contador-carrito" id="contador-carrito">0</span>
                 </button>
             </div>
+<!-- Listado de productos y pinturas -->
+<div class="row row-cols-1 row-cols-md-2 g-4" id="productos-container">
+    <?php if (count($items) === 0): ?>
+        <div class="col-12">
+            <div class="alert alert-info text-center py-4">
+                <i class="fas fa-info-circle me-2"></i> No se encontraron productos o pinturas con los criterios de búsqueda.
+            </div>
+        </div>
+    <?php else: ?>
+        <?php foreach ($items as $item): ?>
+            <div class="col producto-item" data-categoria="<?php echo htmlspecialchars($item['categoria'] ?? ''); ?>" data-tipo="<?php echo htmlspecialchars($item['tipo'] ?? ''); ?>">
+                <div class="producto-card h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between">
+                        <div class="flex-grow-1">
+                            <h3 class="producto-titulo"><?php echo htmlspecialchars($item['nombre'] ?? $item['marca']); ?></h3>
+                            <p class="producto-descripcion"><?php echo htmlspecialchars($item['descripcion'] ?? $item['tamano'] ?? ''); ?></p>
 
-            <!-- Listado de productos -->
-            <div class="row row-cols-1 row-cols-md-2 g-4" id="productos-container">
-                <?php if (count($productos) === 0): ?>
-                    <div class="col-12">
-                        <div class="alert alert-info text-center py-4">
-                            <i class="fas fa-info-circle me-2"></i> No se encontraron productos con los criterios de búsqueda.
+                            <?php if (isset($item['rating'])): ?>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rating-stars">
+                                        <?php
+                                        $rating = $item['rating'];
+                                        $fullStars = floor($rating);
+                                        $halfStar = ($rating - $fullStars) >= 0.5;
+
+                                        for ($i = 0; $i < $fullStars; $i++) {
+                                            echo '<i class="fas fa-star"></i>';
+                                        }
+
+                                        if ($halfStar) {
+                                            echo '<i class="fas fa-star-half-alt"></i>';
+                                        }
+
+                                        $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                                        for ($i = 0; $i < $emptyStars; $i++) {
+                                            echo '<i class="far fa-star"></i>';
+                                        }
+                                        ?>
+                                    </div>
+                                    <span class="rating-count ms-2"><?php echo number_format($rating, 1); ?>
+                                        (<?php echo $item['reviews'] ?? 0; ?>)</span>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- SKU o "N/A" si no existe -->
+                            <p class="producto-sku">SKU: <?php echo htmlspecialchars($item['sku'] ?? 'N/A'); ?></p>
+
+                            <!-- Precio, asegurándonos de redondear a dos decimales -->
+                            <p class="producto-precio">$<?php echo number_format($item['precio'], 2); ?></p>
+                        </div>
+
+                        <!-- Mostrar imagen o texto si no hay imagen -->
+                        <div class="producto-imagen ms-3">
+                            <?php if (!empty($item['imagen'])): ?>
+                                <img src="<?php echo htmlspecialchars($item['imagen']); ?>" alt="<?php echo htmlspecialchars($item['nombre'] ?? $item['marca']); ?>" class="img-fluid">
+                            <?php else: ?>
+                                <h2>Pintura</h2>
+                            <?php endif; ?>
                         </div>
                     </div>
-                <?php else: ?>
-                    <?php foreach ($productos as $producto): ?>
-                        <div class="col producto-item"
-                            data-categoria="<?php echo htmlspecialchars($producto['categoria'] ?? ''); ?>"
-                            data-tipo="<?php echo htmlspecialchars($producto['tipo'] ?? ''); ?>">
-                            <div class="producto-card h-100">
-                                <h3 class="producto-titulo"><?php echo htmlspecialchars($producto['nombre']); ?></h3>
-                                <p class="producto-descripcion"><?php echo htmlspecialchars($producto['descripcion'] ?? ''); ?></p>
 
-                                <?php if (isset($producto['rating'])): ?>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="rating-stars">
-                                            <?php
-                                            $rating = $producto['rating'];
-                                            $fullStars = floor($rating);
-                                            $halfStar = ($rating - $fullStars) >= 0.5;
-
-                                            for ($i = 0; $i < $fullStars; $i++) {
-                                                echo '<i class="fas fa-star"></i>';
-                                            }
-
-                                            if ($halfStar) {
-                                                echo '<i class="fas fa-star-half-alt"></i>';
-                                            }
-
-                                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
-                                            for ($i = 0; $i < $emptyStars; $i++) {
-                                                echo '<i class="far fa-star"></i>';
-                                            }
-                                            ?>
-                                        </div>
-                                        <span class="rating-count ms-2"><?php echo number_format($rating, 1); ?>
-                                            (<?php echo $producto['reviews'] ?? 0; ?>)</span>
-                                    </div>
-                                <?php endif; ?>
-
-                                <p class="producto-sku">SKU: <?php echo htmlspecialchars($producto['sku'] ?? 'N/A'); ?></p>
-
-                                <p class="producto-precio">$<?php echo number_format($producto['precio'], 2); ?></p>
-
-                                <div class="producto-acciones">
-                                    <div class="quantity-control">
-                                        <button class="quantity-btn">-</button>
-                                        <input type="number" class="quantity-input" value="1" min="1">
-                                        <button class="quantity-btn">+</button>
-                                    </div>
-                                    <button class="add-btn" data-id="<?php echo $producto['id']; ?>"
-                                        data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>"
-                                        data-precio="<?php echo $producto['precio']; ?>"
-                                        data-proveedor="<?php echo htmlspecialchars($proveedor['nombre']); ?>">
-                                        <i class="fas fa-cart-plus"></i>
-                                        <span>Agregar</span>
-                                    </button>
-                                </div>
-                            </div>
+                    <div class="producto-acciones mt-auto">
+                        <div class="quantity-control">
+                            <button class="quantity-btn">-</button>
+                            <input type="number" class="quantity-input" value="1" min="1">
+                            <button class="quantity-btn">+</button>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                        <!-- Botón Agregar -->
+                        <button class="add-btn" 
+                            data-id="<?php echo $item['id']; ?>"
+                            data-nombre="<?php echo htmlspecialchars($item['nombre'] ?? $item['marca']); ?>"
+                            data-precio="<?php echo number_format($item['precio'], 2); ?>"
+                            data-proveedor="<?php echo htmlspecialchars($proveedor['nombre']); ?>">
+                            <i class="fas fa-cart-plus"></i>
+                            <span>Agregar</span>
+                        </button>
+                    </div>
+                </div>
             </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
 
-            <!-- Paginación -->
-            <nav aria-label="Page navigation" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+
+<!-- Paginación -->
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item <?php echo ($paginaActual <= 1) ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?pagina=<?php echo $paginaActual - 1; ?>" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+            <li class="page-item <?php echo ($i == $paginaActual) ? 'active' : ''; ?>">
+                <a class="page-link" href="?pagina=<?php echo $i; ?>"><?php echo $i; ?></a>
+            </li>
+        <?php endfor; ?>
+        <li class="page-item <?php echo ($paginaActual >= $totalPaginas) ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?pagina=<?php echo $paginaActual + 1; ?>" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
+
         <?php endif; ?>
     </div>
 
@@ -499,191 +580,184 @@ $litros_a_agregar = $litrosPintura;  // La cantidad de pintura es el mismo núme
                 .catch(error => {
                     console.error('Error al cargar datos del proveedor:', error);
                 });
-        }
-// Función principal que recibe el proveedor_id
-function calcularMinimo(proveedor_id) {
-    // Cargar datos del proveedor
-    cargarDatosProveedor(proveedor_id, function() {
-        // Vaciar completamente el carrito antes de empezar
-        carrito = []; // Vaciar la variable global
-        localStorage.setItem('carrito', JSON.stringify(carrito)); // Vaciar localStorage
-        
-        // Producto predeterminado: Brocha
-        const brocha = productosGlobal.find(producto => 
-            producto.producto_nombre.toLowerCase().includes('brocha'));
-
-        if (brocha) {
-            carrito.push({
-                id: brocha.id,
-                nombre: brocha.producto_nombre || brocha.nombre,
-                precio: parseFloat(brocha.precio).toFixed(2),
-                proveedor: brocha.nombre,
-                cantidad: 1,
-                Litros: 0,
-                tamano: null
-            });
-        }
-
-        let litrosRestantes = litrosPinturaGlobal;
-        const carritoPinturas = [];
-        
-        // Ordenar pinturas por tamaño (de mayor a menor)
-        pinturasGlobal.sort((a, b) => b.tamano - a.tamano);
-        
-        // Calcular cuántas pinturas de cada tamaño necesitamos
-        pinturasGlobal.forEach(pintura => {
-            if (litrosRestantes <= 0) return;
-            
-            let precio = parseFloat(pintura.precio);
-            if (isNaN(precio) || precio <= 0) {
-                console.error('Precio inválido para la pintura', pintura);
-                return;
             }
+            // Función principal que recibe el proveedor_id
+            function calcularMinimo(proveedor_id) {
+                // Cargar datos del proveedor
+                cargarDatosProveedor(proveedor_id, function() {
+                    // Vaciar completamente el carrito antes de empezar
+                    carrito = []; // Vaciar la variable global
+                    localStorage.setItem('carrito', JSON.stringify(carrito)); // Vaciar localStorage
+                    
+                    // Producto predeterminado: Brocha
+                    const brocha = productosGlobal.find(producto => 
+                        producto.producto_nombre.toLowerCase().includes('brocha'));
 
-            const unidades = Math.floor(litrosRestantes / pintura.tamano);
-            if (unidades > 0) {
-                carritoPinturas.push({
-                    id: pintura.id,
-                    nombre: 'Pintura ' + pintura.tamano + 'L',
-                    precio: precio.toFixed(2),
-                    proveedor: pintura.nombre,
-                    cantidad: unidades,
-                    Litros: pintura.tamano * unidades,
-                    tamano: pintura.tamano
-                });
-                litrosRestantes -= pintura.tamano * unidades;
-            }
-        });
-
-        // Si quedan litros sin cubrir, agregar una unidad de la pintura más pequeña
-        if (litrosRestantes > 0 && pinturasGlobal.length > 0) {
-            const pinturaMasPequena = pinturasGlobal[pinturasGlobal.length - 1];
-            carritoPinturas.push({
-                id: pinturaMasPequena.id,
-                nombre: 'Pintura ' + pinturaMasPequena.tamano + 'L',
-                precio: pinturaMasPequena.precio.toFixed(2),
-                proveedor: pinturaMasPequena.nombre,
-                cantidad: 1,
-                Litros: pinturaMasPequena.tamano,
-                tamano: pinturaMasPequena.tamano
-            });
-        }
-
-        // Agregar todas las pinturas al carrito (no hay duplicados porque el carrito está vacío)
-        carritoPinturas.forEach(pintura => {
-            carrito.push(pintura);
-        });
-
-        // Guardar el carrito actualizado
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-
-        // Actualizar interfaz
-        actualizarCarrito();
-        actualizarContadorCarrito();
-        
-        // Mostrar notificación
-        mostrarNotificacion('Carrito actualizado con los productos necesarios');
-    });
-}
-        // Cargar datos iniciales si hay proveedor_id en la URL
-        <?php if (isset($_GET['proveedor_id'])): ?>
-            document.addEventListener('DOMContentLoaded', function () {
-                calcularMinimo(<?php echo $_GET['proveedor_id']; ?>);
-            });
-        <?php endif; ?>
-        // Carrito de compras
-        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-
-        // Actualizar contador del carrito
-        function actualizarContadorCarrito() {
-            const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
-            document.getElementById('contador-carrito').textContent = totalItems;
-        }
-
-        // Mostrar notificación
-        function mostrarNotificacion(mensaje, tipo = 'success') {
-            const alertContainer = document.getElementById('alert-container');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${tipo} alert-dismissible fade show`;
-            alert.role = 'alert';
-            alert.innerHTML = `
-                <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-                ${mensaje}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-
-            alertContainer.appendChild(alert);
-
-            // Eliminar la notificación después de 3 segundos
-            setTimeout(() => {
-                alert.remove();
-            }, 3000);
-        }
-
-        // Funcionalidad para los controles de cantidad
-        document.querySelectorAll('.quantity-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const input = this.parentNode.querySelector('.quantity-input');
-                let value = parseInt(input.value);
-
-                if (this.textContent === '+') {
-                    input.value = value + 1;
-                } else {
-                    if (value > 1) {
-                        input.value = value - 1;
+                    if (brocha) {
+                        carrito.push({
+                            id: brocha.id,
+                            nombre: brocha.producto_nombre || brocha.nombre,
+                            precio: parseFloat(brocha.precio).toFixed(2),
+                            proveedor: brocha.nombre,
+                            cantidad: 1,
+                            Litros: 0,
+                            tamano: null
+                        });
                     }
-                }
 
-                // Disparar evento change para actualizar
-                const event = new Event('change');
-                input.dispatchEvent(event);
-            });
-        });
-
-        // Validación del input de cantidad
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            input.addEventListener('change', function () {
-                if (this.value < 1 || isNaN(this.value)) {
-                    this.value = 1;
-                }
-            });
-        });
-
-        // Funcionalidad para los botones de agregar
-        document.querySelectorAll('.add-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const productoId = this.dataset.id;
-                const productoNombre = this.dataset.nombre;
-                const productoPrecio = parseFloat(this.dataset.precio);
-                const proveedorNombre = this.dataset.proveedor;
-                const cantidad = parseInt(this.closest('.producto-acciones').querySelector('.quantity-input').value);
-
-                const productoExistente = carrito.find(item => item.id === productoId);
-
-                if (productoExistente) {
-                    productoExistente.cantidad += cantidad;
-                } else {
-                    carrito.push({
-                        id: brocha.id,
-                        nombre: brocha.nombre, // Usa el nombre correcto                        
-                        proveedor: brocha.nombre, // Asigna el proveedor correctamente
-                        precio: parseFloat(brocha.precio).toFixed(2),
-                        cantidad: 1,
-                        Litros: 0
+                    let litrosRestantes = litrosPinturaGlobal;
+                    const carritoPinturas = [];
+                    
+                    // Ordenar pinturas por tamaño (de mayor a menor)
+                    pinturasGlobal.sort((a, b) => b.tamano - a.tamano);
+                    
+                    // Calcular cuántas pinturas de cada tamaño necesitamos
+                    pinturasGlobal.forEach(pintura => {
+                        if (litrosRestantes <= 0) return;
                         
+                        let precio = parseFloat(pintura.precio);
+                        if (isNaN(precio) || precio <= 0) {
+                            console.error('Precio inválido para la pintura', pintura);
+                            return;
+                        }
+
+                        const unidades = Math.floor(litrosRestantes / pintura.tamano);
+                        if (unidades > 0) {
+                            carritoPinturas.push({
+                                id: pintura.id,
+                                nombre: 'Pintura ' + pintura.tamano + 'L',
+                                precio: precio.toFixed(2),
+                                proveedor: pintura.nombre,
+                                cantidad: unidades,
+                                Litros: pintura.tamano * unidades,
+                                tamano: pintura.tamano
+                            });
+                            litrosRestantes -= pintura.tamano * unidades;
+                        }
                     });
-                }
 
-                // Guardar en localStorage
-                localStorage.setItem('carrito', JSON.stringify(carrito));
+                    // Si quedan litros sin cubrir, agregar una unidad de la pintura más pequeña
+                    if (litrosRestantes > 0 && pinturasGlobal.length > 0) {
+                        const pinturaMasPequena = pinturasGlobal[pinturasGlobal.length - 1];
+                        carritoPinturas.push({
+                            id: pinturaMasPequena.id,
+                            nombre: 'Pintura ' + pinturaMasPequena.tamano + 'L',
+                            precio: pinturaMasPequena.precio.toFixed(2),
+                            proveedor: pinturaMasPequena.nombre,
+                            cantidad: 1,
+                            Litros: pinturaMasPequena.tamano,
+                            tamano: pinturaMasPequena.tamano
+                        });
+                    }
 
-                // Mostrar notificación
-                mostrarNotificacion(`${cantidad} x ${productoNombre} agregado al carrito`);
+                    // Agregar todas las pinturas al carrito (no hay duplicados porque el carrito está vacío)
+                    carritoPinturas.forEach(pintura => {
+                        carrito.push(pintura);
+                    });
 
-                actualizarContadorCarrito();
-                actualizarCarrito();
+                    // Guardar el carrito actualizado
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+
+                    // Actualizar interfaz
+                    actualizarCarrito();
+                    actualizarContadorCarrito();
+                    
+                    // Mostrar notificación
+                    mostrarNotificacion('Carrito actualizado con los productos necesarios');
+                });
+            }
+                    // Cargar datos iniciales si hay proveedor_id en la URL
+                    <?php if (isset($_GET['proveedor_id'])): ?>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            calcularMinimo(<?php echo $_GET['proveedor_id']; ?>);
+                        });
+                    <?php endif; ?>
+                    // Carrito de compras
+                    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+                    // Actualizar contador del carrito
+                    function actualizarContadorCarrito() {
+                        const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+                        document.getElementById('contador-carrito').textContent = totalItems;
+                    }
+
+                    // Mostrar notificación
+                    function mostrarNotificacion(mensaje, tipo = 'success') {
+                        const alertContainer = document.getElementById('alert-container');
+                        const alert = document.createElement('div');
+                        alert.className = `alert alert-${tipo} alert-dismissible fade show`;
+                        alert.role = 'alert';
+                        alert.innerHTML = `
+                            <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                            ${mensaje}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+
+                        alertContainer.appendChild(alert);
+
+                        // Eliminar la notificación después de 3 segundos
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 3000);
+                    }
+
+                    // Funcionalidad para los controles de cantidad
+                    document.querySelectorAll('.quantity-btn').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const input = this.parentNode.querySelector('.quantity-input');
+                            let value = parseInt(input.value);
+
+                            if (this.textContent === '+') {
+                                input.value = value + 1;
+                            } else {
+                                if (value > 1) {
+                                    input.value = value - 1;
+                                }
+                            }
+
+                            // Disparar evento change para actualizar
+                            const event = new Event('change');
+                            input.dispatchEvent(event);
+                        });
+                    });
+
+                    // Validación del input de cantidad
+                    document.querySelectorAll('.quantity-input').forEach(input => {
+                        input.addEventListener('change', function () {
+                            if (this.value < 1 || isNaN(this.value)) {
+                                this.value = 1;
+                            }
+                        });
+                    });
+
+                    document.querySelectorAll('.add-btn').forEach(boton => {
+                boton.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    const nombre = this.dataset.nombre;
+                    const precio = parseFloat(this.dataset.precio);
+                    const proveedor = this.dataset.proveedor;
+
+                    // Obtener la cantidad seleccionada
+                    const cantidadInput = this.closest('.producto-acciones').querySelector('.quantity-input');
+                    const cantidad = parseInt(cantidadInput.value) || 1;
+
+                    // Buscar si ya existe en el carrito
+                    const index = carrito.findIndex(item => item.id === id);
+                    if (index !== -1) {
+                        carrito[index].cantidad += cantidad;
+                    } else {
+                        carrito.push({ id, nombre, precio, proveedor, cantidad });
+                    }
+
+                    // Guardar en localStorage
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+
+                    // Actualizar UI
+                    actualizarContadorCarrito();
+                    mostrarNotificacion('Producto agregado al carrito', 'success');
+                });
             });
-        });
+
 
         // Funcionalidad para los filtros
         document.querySelectorAll('.filter-select').forEach(select => {
@@ -738,7 +812,7 @@ function calcularMinimo(proveedor_id) {
             <table class="table table-hover">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th>imagen</th>
                         <th>Producto/Pintura</th>
                         <th>Proveedor</th>
                         <th>Precio Unitario</th>
@@ -808,17 +882,44 @@ function calcularMinimo(proveedor_id) {
             carritoModal.show();
         });
 
-        // Finalizar compra
         document.getElementById('finalizar-compra').addEventListener('click', function () {
             if (carrito.length === 0) {
                 mostrarNotificacion('No hay productos en el carrito', 'warning');
                 return;
             }
 
-            // Aquí puedes agregar la lógica para generar la cotización
-            mostrarNotificacion('Cotización generada con éxito! Se ha creado un PDF con los detalles.');
+            // Generar PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-            // Limpiar el carrito
+            doc.setFontSize(16);
+            doc.text('Cotización de Productos', 14, 20);
+
+            const fecha = new Date().toLocaleDateString();
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${fecha}`, 14, 27);
+
+            const tabla = carrito.map(item => [
+                item.id,
+                item.nombre,
+                item.proveedor || 'N/A',
+                `$${Number(item.precio).toFixed(2)}`,
+                item.cantidad,
+                `$${(item.precio * item.cantidad).toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                head: [['ID', 'Producto', 'Proveedor', 'Precio Unitario', 'Cantidad', 'Subtotal']],
+                body: tabla,
+                startY: 35
+            });
+
+            const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+            doc.text(`Total: $${total.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+
+            doc.save('cotizacion.pdf');
+
+            // Limpiar el carrito después de generar
             carrito = [];
             localStorage.removeItem('carrito');
             actualizarContadorCarrito();
@@ -827,6 +928,8 @@ function calcularMinimo(proveedor_id) {
             // Cerrar el modal
             const carritoModal = bootstrap.Modal.getInstance(document.getElementById('carritoModal'));
             carritoModal.hide();
+
+            mostrarNotificacion('Cotización generada con éxito! Se ha descargado un PDF con los detalles.');
         });
 
         // Inicializar contador del carrito
